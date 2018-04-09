@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "removeComments": true,
+    "noUnusedParameters": true,
+    "outDir": "app",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/@types/*",
+        "dev-app/types/*"
+      ]
+    }
+  },
+  "include": [
+    "dev-app/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dev-app/**/*.spec.ts"
+  ]
+}

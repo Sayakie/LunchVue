@@ -1,73 +1,92 @@
-import * as request from 'request'
+import { createServer, Server } from 'http'
 
-class LunchVue {
-  PREFIX: string
-  TYPE: object
-  SUFFIX: string
-  DOMAIN: Array<string>
+import * as path from 'path'
+import * as express from 'express'
+import * as compression from 'compression'
+import * as logger from 'morgan'
+import * as bodyParser from 'body-parser'
 
+class App {
+  public static readonly PORT: number | string | boolean //= Validator.normalizePort(config.port || process.env.PORT)
+  private server: Server
+  private express: express.Application
+  // private io: SockerIO.Server
+  private port: number | string | boolean
+
+  /**
+   * Set up the application. Assign variables to allow access to each framework, including Express.js and Socker.io Servers, and allow them to respond to the port. Also set the error handler to make debugging easier.
+   * 
+   * @constructor
+   */
   constructor() {
-    this.init()
+    this.initialization()
+    this.configuration()
+    this.listen()
   }
 
   /**
-   * Initialize LunchVue
+   * Bootstrap the application.
    * 
-   * @private
+   * @return {App}
    */
-  private init() {
-    this.PREFIX = 'stu.'
-    this.SUFFIX = '.go.kr'
-    this.TYPE = [
-      'sen',  // 서울특별시
-      'pen',  // 부산광역시
-      'dge',  // 대구광역시
-      'ice',  // 인천광역시
-      'gen',  // 광주광역시
-      'dje',  // 대전광역시
-      'use',  // 울산광역시
-      'sje',  // 세종특별자치시
-      'goe',  // 경기도
-      'gwe',  // 강원도
-      'cbe',  // 충청북도
-      'cne',  // 충청남도
-      'jbe',  // 전라북도
-      'jne',  // 전라남도
-      'gbe',  // 경상북도
-      'gne',  // 경상남도
-      'jje'   // 제주도
-    ]
-
-    for (const i in this.TYPE) {
-      this.DOMAIN.push(this.PREFIX + this.TYPE[i] + this.SUFFIX)
-    }
+  public static bootstrap(): App {
+    return new App()
   }
 
-  find(school: string) {
-    const query = encodeURIComponent(school)
+  /**
+   * Initial the application.
+   */
+  private initialization(): void {
+    this.express = express()
+    this.server = createServer(this.express)
+    // this.io = socketIO(this.server)
+  }
 
-    Object.keys(this.DOMAIN).map((domain, i) => {
-      request({
-        uri: `https://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
-        json: true
-      }, (err, res, data) => {
-        if (err) {
-          throw TypeError(`No such dep: ${err}`)
-        }
+  /**
+   * Config the applicaiton.
+   */
+  private configuration(): void {
+    this.port = App.PORT
 
-        data.resultSVO.orgDVOList.map( school => {
-          return {
-            name: school.kraOrgNm,
-            code: school.orgCode,
-            type: school.schulCrseScCodeNm,
-            address: school.zipAdres
-          }
-        } )
-      }).on('error', (err) => {
-        throw TypeError(`Request failed: ${err}`)
-      })
+    //
+    // <!-- Express Territory -->
+    this.express.disable('x-powered-by')
+    this.express.set('views', path.join(__dirname, '../views'))
+    this.express.set('view engine', 'hbs')
+    this.express.use(compression())
+    this.express.use(logger('dev'))
+    this.express.use(bodyParser.json())
+    this.express.use(bodyParser.urlencoded({ extended: false }))
+    this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: 31557600000 }))
+    this.express.use('/', express.static(path.join(__dirname, '../assets/static'), { maxAge: 31557600000 }))
+  }
+
+  private listen(): void {
+    this.server.listen(this.port, () => {
+      // Application is running successfully
+    })
+    this.server.on('error', (e: NodeJS.ErrnoException) => {
+      if (e.syscall !== 'listen') {
+        throw e
+      }
+
+      // Handle specific listen errors with friendly messages
+      const bind = (typeof this.port === 'string') ? `Pipe ${this.port}` : `Port ${this.port}`
+      switch (e.code) {
+        case 'EACCES':
+          console.error(`Permission denied`)
+          process.exit(1)
+          break
+        case 'EADDRINUSE':
+          console.error(`${bind} already in use`)
+          process.exit(1)
+          break
+        default:
+          throw e
+      }
     })
   }
 }
 
-export = LunchVue
+const app = App.bootstrap()
+export default app
