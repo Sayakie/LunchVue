@@ -6,8 +6,10 @@ import * as compression from 'compression'
 import * as logger from 'morgan'
 import * as bodyParser from 'body-parser'
 
+import { default as Validator } from './lib/Validator'
+
 class App {
-  public static readonly PORT: number | string | boolean //= Validator.normalizePort(config.port || process.env.PORT)
+  public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT)
   private server: Server
   private express: express.Application
   // private io: SockerIO.Server
