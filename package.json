@@ -6,7 +6,8 @@
   "repository": "https://github.com/Kurosnape/LunchVue",
   "author": "Kurosnape <shuvi.dev.b701@gmail.com> (https://kurosnape.github.io)",
   "scripts": {
-    "start": "node ./app/index.js"
+    "start": "node ./app/index.js",
+    "dev": "nodemon --watch 'dev-app' --ignore 'dev-app/**/*.spec.ts' --exec ts-node dev-app/index.ts"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -25,6 +26,8 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.6.2",
     "@types/request": "^2.47.0",
+    "nodemon": "^1.17.3",
+    "ts-node": "^5.0.1",
     "typescript": "^2.8.1"
   },
   "license": "MIT",

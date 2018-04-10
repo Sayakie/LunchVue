@@ -43,7 +43,7 @@ export class IndexRoute extends BaseRoute {
    */
   public index(req: Request, res: Response, next: NextFunction) {
     let options: object = {
-      'test': 'Text me'
+      'test': 'Test me XD'
     }
 
     this.render(req, res, 'index', options)

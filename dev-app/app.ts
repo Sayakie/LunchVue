@@ -9,8 +9,6 @@ import * as dotenv from 'dotenv'
 dotenv.config({ path: '.env' })
 
 import { default as Validator } from './lib/Validator'
-
-//import * as mainController from './controllers/main'
 import { IndexRoute } from './controllers/index';
 
 interface IError {
@@ -134,7 +132,6 @@ class App {
   private routes(): void {
     const router: express.Router = express.Router()
 
-    //router.get('/', mainController.index)
     IndexRoute.create(router)
     this.express.use(router)
   }
