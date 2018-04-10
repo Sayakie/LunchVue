@@ -1,18 +1,18 @@
 class Validator {
   /**
-   * Bootstrap the validator.
+   * Bootstrap the validator
    */
   public static bootstrap() {
     return new Validator()
   }
 
   /**
-   * Returns {val} into a number, string, or false
+   * Takes a {val} into a number, string or false
    * 
    * @param val string to test.
    */
-  public normalizePort(val: number | string | boolean): number | string | boolean {
-    const port: any = (typeof val === 'string') ? parseInt(val, 10) : val
+  public normalizePort(val: number | string): number | string | boolean {
+    const port: number = (typeof val === 'string') ? parseInt(val, 10) : val
 
     if (isNaN(port)) {
       return val

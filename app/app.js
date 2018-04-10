@@ -6,11 +6,14 @@ const express = require("express");
 const compression = require("compression");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+const Validator_1 = require("./lib/Validator");
+const mainController = require("./controllers/main");
 class App {
     constructor() {
         this.initialization();
         this.configuration();
         this.listen();
+        this.routes();
     }
     static bootstrap() {
         return new App();
@@ -53,7 +56,12 @@ class App {
             }
         });
     }
+    routes() {
+        const router = express.Router();
+        router.get('/', mainController.index);
+    }
 }
+App.PORT = Validator_1.default.normalizePort(process.env.PORT);
 const app = App.bootstrap();
 exports.default = app;
 //# sourceMappingURL=app.js.map
