@@ -48,6 +48,7 @@ export class BaseRoute {
     res.locals.BASE_URL = '/'
     res.locals.scripts = this.scripts
     res.locals.title = this.title
+    res.locals.default_url = process.env.DOMAIN
     res.render(view, options)
   }
 }

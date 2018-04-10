@@ -12,8 +12,8 @@ class IndexRoute extends route_1.BaseRoute {
         });
     }
     index(req, res, next) {
-        this.title = 'LunchVue';
         let options = {
+            'title': 'LunchVue ─ 전국 급식 식단표',
             "message": "Hi, this is test msg"
         };
         this.render(req, res, 'index', options);

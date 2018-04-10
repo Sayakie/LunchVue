@@ -42,9 +42,8 @@ export class IndexRoute extends BaseRoute {
    * @next {NextFunction} Execute the next method.
    */
   public index(req: Request, res: Response, next: NextFunction) {
-    this.title = 'LunchVue'
     let options: object = {
-      "message": "Hi, this is test msg"
+      'test': 'Text me'
     }
 
     this.render(req, res, 'index', options)
