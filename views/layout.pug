@@ -1,6 +1,63 @@
-doctype html
-html
+DOCTYPE html
+html(lang='ko')
   head
     block title
+    //-
+      Required meta tags always come first
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge,chrome=1')
+    meta(name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no')
+    //-
+      Order tot index this document and to track links within it so all bots.
+      Also instruct the googlebot does not translate this so as to keep ko-KR
+    meta(name='robots' content='index,follow')
+    meta(name='google' content='notranslate')
+    //-
+      To prevent duplicate URLs, specify a standard page,
+      and set dns-prefetch to improve the speed of redirects
+    link(rel='canonical' href='#{url}')
+    link(rel='dns-prefetch' href='//lunchvue.doroshi.ml')
+    link(rel='dns-prefecth' href='//fonts.googleapis.com')
+    //-
+      Declare an app manifest to app can:
+      - Have a rich presence on the user's Android home screen
+      - Be launched in full-screen mode on Android with no URL bar
+      - Control the screen orientation for optimal viewing
+      - Define a "splash screen" launch experience and theme color for the site
+      - Track whether you're launched from the home screen or URL bar
+    link(rel='manifest' href='/assets/manifest.json')
+    link(rel='shortcut icon' href='/assets/favicon.ico')
+    link(rel='apple-touch-icon' sizes='57x57' href='/assets/apple-touch-icon.x57.png')
+    link(rel='apple-touch-icon' sizes='72x72' href='/assets/apple-touch-icon.x72.png')
+    link(rel='apple-touch-startup-image' href='/assets/apple-touch-splash.png')
+    meta(name='apple-mobile-web-app-capable' content='yes')
+    meta(name='apple-mobile-web-app-status-bar-style' content='black')
+    meta(name='apple-mobile-web-app-title' content='#{title}')
+    //- To work native web
+    meta(property='og:locale' content='ko_KR')
+    meta(property='og:site_name' content='#{title}')
+    meta(property='og:url' content='#{url}')
+    meta(name='author' content='Kurosnape')
+    meta(name='description' content='#{description}')
+    meta(property='og:title' content='#{title}')
+    meta(property='og:description' content='#{description}')
+    meta(property='og:image' content='#{url}assets/splash.png')
+    meta(name='twitter:card' content='summary_large_image')
+    meta(name='twitter:site' content='@Kurosnape')
+    meta(name='twitter:creator' content='@Kurosnape')
+    meta(name='twitter:title' content='#{title}')
+    meta(name='twitter:description' content='#{description}')
+    meta(name='twitter:image' content='#{url}assets/splash.png')
+    script(type='application/ld+json')
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite"
+        "name": "#{title}",
+        "description": "#{description}"
+        "author": "Kurosnape",
+        "image": "#{url}assets/splash.thumb.png",
+        "url": "#{url}"
+      }
+    //- Stylesheets & Scripts
   body
     block content
