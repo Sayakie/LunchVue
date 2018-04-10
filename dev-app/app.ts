@@ -8,7 +8,8 @@ import * as bodyParser from 'body-parser'
 
 import { default as Validator } from './lib/Validator'
 
-import * as mainController from './controllers/main'
+//import * as mainController from './controllers/main'
+import { IndexRoute } from './controllers/index';
 
 interface IError {
   status?: number,
@@ -129,7 +130,9 @@ class App {
   private routes(): void {
     const router: express.Router = express.Router()
 
-    router.get('/', mainController.index)
+    //router.get('/', mainController.index)
+    IndexRoute.create(router)
+    this.express.use(router)
   }
 }
 

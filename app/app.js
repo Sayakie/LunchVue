@@ -7,7 +7,7 @@ const compression = require("compression");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const Validator_1 = require("./lib/Validator");
-const mainController = require("./controllers/main");
+const index_1 = require("./controllers/index");
 class App {
     constructor() {
         this.initialization();
@@ -33,6 +33,10 @@ class App {
         this.express.use(bodyParser.urlencoded({ extended: false }));
         this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: 31557600000 }));
         this.express.use('/', express.static(path.join(__dirname, '../assets/static'), { maxAge: 31557600000 }));
+        this.express.use((err, req, res, next) => {
+            err.status = 404;
+            next(err);
+        });
     }
     listen() {
         this.server.listen(this.port, () => {
@@ -44,11 +48,11 @@ class App {
             const bind = (typeof this.port === 'string') ? `Pipe ${this.port}` : `Port ${this.port}`;
             switch (e.code) {
                 case 'EACCES':
-                    console.error(`Permission denied`);
+                    console.error(`Permission denied. Requires elevated privileges`);
                     process.exit(1);
                     break;
                 case 'EADDRINUSE':
-                    console.error(`${bind} already in use`);
+                    console.error(`${bind} is already in use`);
                     process.exit(1);
                     break;
                 default:
@@ -58,7 +62,8 @@ class App {
     }
     routes() {
         const router = express.Router();
-        router.get('/', mainController.index);
+        index_1.IndexRoute.create(router);
+        this.express.use(router);
     }
 }
 App.PORT = Validator_1.default.normalizePort(process.env.PORT);
