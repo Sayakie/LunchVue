@@ -6,6 +6,8 @@ const express = require("express");
 const compression = require("compression");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+dotenv.config({ path: '.env' });
 const Validator_1 = require("./lib/Validator");
 const index_1 = require("./controllers/index");
 class App {
@@ -26,7 +28,7 @@ class App {
         this.port = App.PORT;
         this.express.disable('x-powered-by');
         this.express.set('views', path.join(__dirname, '../views'));
-        this.express.set('view engine', 'hbs');
+        this.express.set('view engine', 'pug');
         this.express.use(compression());
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
@@ -40,6 +42,7 @@ class App {
     }
     listen() {
         this.server.listen(this.port, () => {
+            console.log(`[Server] Successfully Listening on ${this.port}`);
         });
         this.server.on('error', (e) => {
             if (e.syscall !== 'listen') {
@@ -66,7 +69,7 @@ class App {
         this.express.use(router);
     }
 }
-App.PORT = Validator_1.default.normalizePort(process.env.PORT);
+App.PORT = Validator_1.default.normalizePort(process.env.PORT || 3000);
 const app = App.bootstrap();
 exports.default = app;
 //# sourceMappingURL=app.js.map

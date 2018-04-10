@@ -1,0 +1,5 @@
+{
+  "tslint.autoFixOnSave": true,
+  "tslint.alwaysShowStatus": true,
+  "tslint.run": "onSave"
+}

@@ -5,6 +5,8 @@ import * as express from 'express'
 import * as compression from 'compression'
 import * as logger from 'morgan'
 import * as bodyParser from 'body-parser'
+import * as dotenv from 'dotenv'
+dotenv.config({ path: '.env' })
 
 import { default as Validator } from './lib/Validator'
 
@@ -17,7 +19,7 @@ interface IError {
 }
 
 class App {
-  public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT)
+  public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT || 3000)
   private server: Server
   private express: express.Application
   // private io: SockerIO.Server
@@ -75,7 +77,7 @@ class App {
     // <!-- Express Territory -->
     this.express.disable('x-powered-by')
     this.express.set('views', path.join(__dirname, '../views'))
-    this.express.set('view engine', 'hbs')
+    this.express.set('view engine', 'pug')
     this.express.use(compression())
     this.express.use(logger('dev'))
     this.express.use(bodyParser.json())
@@ -98,7 +100,7 @@ class App {
    */
   private listen(): void {
     this.server.listen(this.port, () => {
-      // Application is running successfully
+      console.log(`[Server] Successfully Listening on ${this.port}`)
     })
     this.server.on('error', (e: NodeJS.ErrnoException) => {
       if (e.syscall !== 'listen') {
@@ -123,9 +125,11 @@ class App {
   }
 
   /**
+   * Create and return Router.
    * 
    * @class App
    * @method routes
+   * @return void
    */
   private routes(): void {
     const router: express.Router = express.Router()

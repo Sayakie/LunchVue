@@ -8,6 +8,16 @@ import { BaseRoute } from './route';
  */
 export class IndexRoute extends BaseRoute {
   /**
+   * Constructor
+   * 
+   * @class IndexRoute
+   * @constructor
+   */
+  constructor() {
+    super()
+  }
+
+  /**
    * Creates the routes.
    * 
    * @class IndexRoute
@@ -20,16 +30,6 @@ export class IndexRoute extends BaseRoute {
     router.get('/', (req: Request, res: Response, next: NextFunction) => {
       new IndexRoute().index(req, res, next)
     })
-  }
-
-  /**
-   * Constructor
-   * 
-   * @class IndexRoute
-   * @constructor
-   */
-  constructor() {
-    super()
   }
 
   /**
