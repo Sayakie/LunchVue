@@ -8,6 +8,8 @@ import * as bodyParser from 'body-parser'
 
 import { default as Validator } from './lib/Validator'
 
+import * as mainController from './controllers/main'
+
 class App {
   public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT)
   private server: Server
@@ -24,6 +26,7 @@ class App {
     this.initialization()
     this.configuration()
     this.listen()
+    this.routes()
   }
 
   /**
@@ -63,6 +66,9 @@ class App {
     this.express.use('/', express.static(path.join(__dirname, '../assets/static'), { maxAge: 31557600000 }))
   }
 
+  /**
+   * Gives 
+   */
   private listen(): void {
     this.server.listen(this.port, () => {
       // Application is running successfully
@@ -87,6 +93,15 @@ class App {
           throw e
       }
     })
+  }
+
+  /**
+   * 
+   */
+  private routes(): void {
+    const router: express.Router = express.Router()
+
+    router.get('/', mainController.index)
   }
 }
 
