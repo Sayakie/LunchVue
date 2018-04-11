@@ -6,7 +6,6 @@ import { NextFunction, Request, Response } from 'express'
  * @class BaseRoute
  */
 export class BaseRoute {
-  protected title: string
   private scripts: string[]
 
   /**
@@ -16,7 +15,6 @@ export class BaseRoute {
    * @constructor
    */
   constructor() {
-    this.title = "LunchVue"
     this.scripts = []
   }
 

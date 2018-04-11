@@ -20,7 +20,7 @@ class App {
   public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT || 3000)
   private server: Server
   private express: express.Application
-  // private io: SockerIO.Server
+  // private socket: SockerIO.Server
   private port: number | string | boolean
 
   /**
@@ -59,7 +59,7 @@ class App {
   private initialization(): void {
     this.express = express()
     this.server = createServer(this.express)
-    // this.io = socketIO(this.server)
+    // this.socket = socketIO(this.server)
   }
 
   /**

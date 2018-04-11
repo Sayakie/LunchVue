@@ -1,5 +1,10 @@
 import * as request from 'request'
 
+declare namespace LunchVue {
+  export function find(school: string): LunchVue
+}
+
+//export namespace LunchVue {
 class LunchVue {
   PREFIX: string
   TYPE: object
@@ -75,5 +80,6 @@ class LunchVue {
     })
   }
 }
+//}
 
-export = LunchVue
+export default LunchVue

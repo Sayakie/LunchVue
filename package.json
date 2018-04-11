@@ -7,7 +7,8 @@
   "author": "Kurosnape <shuvi.dev.b701@gmail.com> (https://kurosnape.github.io)",
   "scripts": {
     "start": "node ./app/index.js",
-    "dev": "nodemon --watch 'dev-app' --ignore 'dev-app/**/*.spec.ts' --exec ts-node dev-app/index.ts"
+    "dev": "nodemon -e ts -w ./dev-app -x yarn run dev:watch",
+    "dev:watch": "ts-node --inspect -- dev-app/index.ts"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
