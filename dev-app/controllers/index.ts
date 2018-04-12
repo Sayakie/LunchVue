@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from 'express'
 import { BaseRoute } from './route';
 
-import LunchVue from '../lib/LunchVue';
+import { default as LunchVue} from '../lib/LunchVue';
 
 
 /**
@@ -34,8 +34,8 @@ export class IndexRoute extends BaseRoute {
       new IndexRoute().index(req, res, next)
     })
 
-    router.get('/test', (req: Request, res: Response, next: NextFunction) => {
-      new IndexRoute().join(req, res, next)
+    router.get('/find/:school', (req: Request, res: Response, next: NextFunction) => {
+      new IndexRoute().find(req, res, next)
     })
   }
 
@@ -65,11 +65,8 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public join(req: Request, res: Response, next: NextFunction) {
-    let options: object = {
-      'data': LunchVue.find('덕인')
-    }
-
-    this.render(req, res, 'join', options)
+  public find(req: Request, res: Response, next: NextFunction) {
+    console.log(LunchVue.find('덕인'))
+    res.json(JSON.stringify(LunchVue.find(req.params.school)))
   }
 }

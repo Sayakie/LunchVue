@@ -9,10 +9,17 @@ class LunchVue {
   PREFIX: string
   TYPE: object
   SUFFIX: string
-  DOMAIN: Array<string>
+  DOMAIN: string[]
 
   constructor() {
     this.init()
+  }
+
+  /**
+   * 
+   */
+  public static bootstrap() {
+    return new LunchVue()
   }
 
   /**
@@ -42,11 +49,12 @@ class LunchVue {
       'gne',  // 경상남도
       'jje'   // 제주도
     ]
+    this.DOMAIN = []
 
     for (const i in this.TYPE) {
       // Because Gyeongsangbuk-do(경상북도) use different domain
       if (this.TYPE[i] === 'gbe') {
-        this.DOMAIN.push(this.PREFIX + this.TYPE[i] + 'kr')
+        this.DOMAIN.push(this.PREFIX + this.TYPE[i] + '.kr')
         return
       }
 
@@ -79,19 +87,29 @@ class LunchVue {
         }
 
         data.resultSVO.orgDVOList.map( school => {
-          return {
+          /* return {
             name: school.kraOrgNm,
             code: school.orgCode,
             type: school.schulCrseScCodeNm,
             address: school.zipAdres
-          }
+          } */
+          console.log()
         })
       }).on('error', err => {
         throw TypeError(`Request failed: ${err}`)
       })
     }
   }
+
+  /**
+   * Tester
+   * 
+   * @method test
+   */
+  public test() {
+    console.log('hi')
+  }
 }
 //}
 
-export default LunchVue
+export default LunchVue.bootstrap()
