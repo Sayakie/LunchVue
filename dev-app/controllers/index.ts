@@ -48,7 +48,7 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public index(req, res) {
+  public index(req: Request, res: Response) {
     let options: object = {
       'test': 'Test me XD!!'
     }
@@ -65,7 +65,7 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public find(req, res) {
+  public find(req: Request, res: Response) {
     res.setHeader('Content-Type', 'application/json')
     res.send( LunchVue.find(req.params.school) )
   }

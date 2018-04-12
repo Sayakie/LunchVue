@@ -70,31 +70,53 @@ class LunchVue {
    * @param school
    */
   public find(school: string) {
+    const DATA = []
     const QUERY = encodeURIComponent(school)
 
     for (const i in this.DOMAIN) {
-      request({
-        method: 'GET',
-        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-        url: `https://${this.DOMAIN[i]}/spr_ccm_cm01_100.do?kraOrgNm=${QUERY}`,
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'lunchvue-request-bot'
-        },
-        json: true
-      }, (err, res, data) => {
-        if (err) {
-          return console.error(`No such dep: ${err}`)
-        }
-
-        data.resultSVO.orgDVOList.map( school => {
-          console.log( school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres )
-        })
-      }).on('error', err => {
-        throw TypeError(`Request failed: ${err}`)
+      this.request(this.DOMAIN[i], QUERY).then(data => {
+        DATA.push(data)
       })
     }
 
+    console.log(DATA)
+    return JSON.stringify(DATA)
+  }
+
+  /**
+   * 
+   * @method request
+   */
+  private async request(domain, query) {
+    const options = {
+      method: 'GET',
+      rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+      url: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+      headers: {
+        'Content-Type': 'applicaiton/json',
+        'User-Agent': 'lunchvue-request-bot'
+      },
+      gzip: true,
+      json: true
+    }
+
+    await request(options, (err, res, body) => {
+      if (err) {
+        return console.error(`No such dep: ${err}`)
+      }
+
+      body.resultSVO.orgDVOList.map( school => {
+        console.log(school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres)
+        return {
+          name: school.kraOrgNm,
+          code: school.orgCode,
+          type: school.schulCrseScCodeNm,
+          address: school.zipAdres
+        }
+      })
+    }).on('error', err => {
+      console.error(`Request failed: ${err}`)
+    })
   }
 }
 
