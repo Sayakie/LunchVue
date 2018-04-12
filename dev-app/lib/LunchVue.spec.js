@@ -25,14 +25,19 @@ const DOMAIN = []
 const QUERY = encodeURIComponent('덕인')
 
 for (const i in TYPE) {
+  if (TYPE[i] === 'gbe') {
+    DOMAIN.push(PREFIX + TYPE[i] + 'kr')
+    return
+  }
   DOMAIN.push(PREFIX + TYPE[i] + SUFFIX)
 }
 
 for (i in DOMAIN) {
   // 경상북도는 왜 주소가 다를까
+  /*
   if (DOMAIN[i] === 'stu.gbe.go.kr') {
     DOMAIN[i] = 'stu.gbe.kr'
-  }
+  }*/
 
   request({
     method: 'GET',

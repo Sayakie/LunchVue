@@ -44,6 +44,12 @@ class LunchVue {
     ]
 
     for (const i in this.TYPE) {
+      // Because Gyeongsangbuk-do(경상북도) use different domain
+      if (this.TYPE[i] === 'gbe') {
+        this.DOMAIN.push(this.PREFIX + this.TYPE[i] + 'kr')
+        return
+      }
+
       this.DOMAIN.push(this.PREFIX + this.TYPE[i] + this.SUFFIX)
     }
   }
@@ -55,18 +61,21 @@ class LunchVue {
    * @param school
    */
   public find(school: string) {
-    const query = encodeURIComponent(school)
+    const QUERY = encodeURIComponent(school)
 
-    Object.keys(this.DOMAIN).map((domain, i) => {
+    for (const i in this.DOMAIN) {
       request({
-        uri: `https://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+        method: 'GET',
+        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+        url: `https://${this.DOMAIN[i]}/spr_ccm_cm01_100.do?kraOrgNm=${QUERY}`,
         headers: {
-          'User-Agent': 'request'
+          'Content-Type': 'application/json',
+          'User-Agent': 'lunchvue-request-bot'
         },
         json: true
-      }, (err: string, res: Express.Response, data) => {
+      }, (err, res, data) => {
         if (err) {
-          throw TypeError(`No such dep: ${err}`)
+          return console.error(`No such dep: ${err}`)
         }
 
         data.resultSVO.orgDVOList.map( school => {
@@ -76,11 +85,11 @@ class LunchVue {
             type: school.schulCrseScCodeNm,
             address: school.zipAdres
           }
-        } )
-      }).on('error', (err) => {
+        })
+      }).on('error', err => {
         throw TypeError(`Request failed: ${err}`)
       })
-    })
+    }
   }
 }
 //}
