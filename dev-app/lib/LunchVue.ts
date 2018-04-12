@@ -4,12 +4,12 @@ declare namespace LunchVue {
   export function find(school: string): LunchVue
 }
 
-//export namespace LunchVue {
 class LunchVue {
   PREFIX: string
   TYPE: object
   SUFFIX: string
   DOMAIN: string[]
+  DATA: object[]
 
   constructor() {
     this.init()
@@ -50,6 +50,7 @@ class LunchVue {
       'jje'   // 제주도
     ]
     this.DOMAIN = []
+    this.DATA = []
 
     for (const i in this.TYPE) {
       // Because Gyeongsangbuk-do(경상북도) use different domain
@@ -87,29 +88,14 @@ class LunchVue {
         }
 
         data.resultSVO.orgDVOList.map( school => {
-          /* return {
-            name: school.kraOrgNm,
-            code: school.orgCode,
-            type: school.schulCrseScCodeNm,
-            address: school.zipAdres
-          } */
-          console.log()
+          DATA += `${school.kraOrgNm} ${school.orgCode} ${school.schulCrseScCodeNm} ${school.zipAdres}\n`
         })
       }).on('error', err => {
         throw TypeError(`Request failed: ${err}`)
       })
     }
-  }
 
-  /**
-   * Tester
-   * 
-   * @method test
-   */
-  public test() {
-    console.log('hi')
   }
 }
-//}
 
 export default LunchVue.bootstrap()

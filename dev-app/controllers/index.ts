@@ -30,12 +30,12 @@ export class IndexRoute extends BaseRoute {
   public static create(router: Router) {
     console.log('[IndexRoute::Create] Creating index route.')
 
-    router.get('/', (req: Request, res: Response, next: NextFunction) => {
-      new IndexRoute().index(req, res, next)
+    router.get('/', (req: Request, res: Response) => {
+      new IndexRoute().index(req, res)
     })
 
-    router.get('/find/:school', (req: Request, res: Response, next: NextFunction) => {
-      new IndexRoute().find(req, res, next)
+    router.get('/find/:school', (req: Request, res: Response) => {
+      new IndexRoute().find(req, res)
     })
   }
 
@@ -48,7 +48,7 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public index(req: Request, res: Response, next: NextFunction) {
+  public index(req, res) {
     let options: object = {
       'test': 'Test me XD!!'
     }
@@ -65,8 +65,8 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public find(req: Request, res: Response, next: NextFunction) {
-    console.log(LunchVue.find('덕인'))
-    res.json(JSON.stringify(LunchVue.find(req.params.school)))
+  public find(req, res) {
+    res.setHeader('Content-Type', 'application/json')
+    res.send( LunchVue.find(req.params.school) )
   }
 }
