@@ -67,6 +67,8 @@ export class IndexRoute extends BaseRoute {
    */
   public find(req: Request, res: Response) {
     res.setHeader('Content-Type', 'application/json')
-    res.send( LunchVue.find(req.params.school) )
+    const DATA = LunchVue.find(req.params.school)
+    console.log(`====> ${DATA}`)
+    setTimeout(() => {res.send(DATA)}, 3000)
   }
 }

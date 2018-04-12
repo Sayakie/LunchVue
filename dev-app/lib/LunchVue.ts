@@ -1,9 +1,5 @@
 import * as request from 'request'
 
-declare namespace LunchVue {
-  export function find(school: string): LunchVue
-}
-
 class LunchVue {
   PREFIX: string
   TYPE: object
@@ -16,7 +12,10 @@ class LunchVue {
   }
 
   /**
+   * Bootstrap the LunchVue Library.
    * 
+   * @method bootstrap
+   * @return {LunchVue}
    */
   public static bootstrap() {
     return new LunchVue()
@@ -56,7 +55,7 @@ class LunchVue {
       // Because Gyeongsangbuk-do(경상북도) use different domain
       if (this.TYPE[i] === 'gbe') {
         this.DOMAIN.push(this.PREFIX + this.TYPE[i] + '.kr')
-        return
+        continue
       }
 
       this.DOMAIN.push(this.PREFIX + this.TYPE[i] + this.SUFFIX)
@@ -71,16 +70,23 @@ class LunchVue {
    */
   public find(school: string) {
     const DATA = []
-    const QUERY = encodeURIComponent(school)
-
+    /*
     for (const i in this.DOMAIN) {
       this.request(this.DOMAIN[i], QUERY).then(data => {
+        console.log(data)
         DATA.push(data)
       })
-    }
+    }*/
 
-    console.log(DATA)
-    return JSON.stringify(DATA)
+    DATA.push(this.request2(encodeURIComponent(school)))
+
+    /*return JSON.stringify([{"name":"덕인초등학교","code":"J100005395","type":"초등학교","address":"경기도 안산시 단원구 와동 1~400"},
+    {"name":"목포덕인중학교","code":"Q100000827","type":"중학교","address":"전라남도 목포시 죽교동 1~93"},
+    {"name":"목포덕인고등학교","code":"Q100000199","type":"고등학교","address":"전라남도 목포시 죽교동 1~93"},
+    {"name":"대구덕인초등학교병설유치원","code":"D100000484","type":"유치원","address":"대구광역시 달서구 본리동"},
+    {"name":"대구덕인초등학교","code":"D100000423","type":"초등학교","address":"대구광역시 달서구 본리동"}])*/
+    console.log(`DATA: ${DATA}`)
+    return DATA
   }
 
   /**
@@ -89,11 +95,9 @@ class LunchVue {
    */
   private async request(domain, query) {
     const options = {
-      method: 'GET',
       rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-      url: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+      uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
       headers: {
-        'Content-Type': 'applicaiton/json',
         'User-Agent': 'lunchvue-request-bot'
       },
       gzip: true,
@@ -106,7 +110,7 @@ class LunchVue {
       }
 
       body.resultSVO.orgDVOList.map( school => {
-        console.log(school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres)
+        //console.log(school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres)
         return {
           name: school.kraOrgNm,
           code: school.orgCode,
@@ -117,6 +121,45 @@ class LunchVue {
     }).on('error', err => {
       console.error(`Request failed: ${err}`)
     })
+  }
+
+  /**
+   * 
+   * @method reqeust2
+   */
+  private request2(query) {
+    for (const domain of this.DOMAIN) {
+      request({
+        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+        uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+        headers: {
+          'User-Agent': 'lunchvue-request-bot'
+        },
+        gzip: true,
+        json: true
+      }, (err, res, body) => {
+        if (err) {
+          return console.error(`No such dep: ${err}`)
+        }
+  
+        body.resultSVO.orgDVOList.map( school => {
+          console.log(JSON.stringify({
+            name: school.kraOrgNm,
+            code: school.orgCode,
+            type: school.schulCrseScCodeNm,
+            address: school.zipAdres
+          }))
+          return JSON.stringify({
+            name: school.kraOrgNm,
+            code: school.orgCode,
+            type: school.schulCrseScCodeNm,
+            address: school.zipAdres
+          })
+        })
+      }).on('error', err => {
+        console.error(`Request failed: ${err}`)
+      })
+    }
   }
 }
 

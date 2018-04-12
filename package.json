@@ -1,6 +1,6 @@
 {
   "name": "lunchvue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Provides lunch info about kr",
   "main": "app/index.js",
   "repository": "https://github.com/Kurosnape/LunchVue",
@@ -18,7 +18,8 @@
     "express": "^4.16.3",
     "morgan": "^1.9.0",
     "pug": "^2.0.3",
-    "request": "^2.85.0"
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
     "@types/compression": "^0.0.36",
@@ -27,6 +28,7 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.6.2",
     "@types/request": "^2.47.0",
+    "@types/request-promise-native": "^1.0.14",
     "nodemon": "^1.17.3",
     "ts-node": "^5.0.1",
     "typescript": "^2.8.1"

@@ -44,7 +44,7 @@ class App {
    * @class App
    * @method bootstrap
    * @static
-   * @return {ng.auto.IInjectorService} Returns the newly created injector for this server.
+   * @return {App} Returns the newly created injector for this server.
    */
   public static bootstrap(): App {
     return new App()
