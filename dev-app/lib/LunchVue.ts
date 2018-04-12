@@ -60,8 +60,11 @@ class LunchVue {
     Object.keys(this.DOMAIN).map((domain, i) => {
       request({
         uri: `https://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+        headers: {
+          'User-Agent': 'request'
+        },
         json: true
-      }, (err, res, data) => {
+      }, (err: string, res: Express.Response, data) => {
         if (err) {
           throw TypeError(`No such dep: ${err}`)
         }
