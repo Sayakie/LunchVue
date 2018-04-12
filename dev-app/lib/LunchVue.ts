@@ -88,7 +88,7 @@ class LunchVue {
         }
 
         data.resultSVO.orgDVOList.map( school => {
-          DATA += `${school.kraOrgNm} ${school.orgCode} ${school.schulCrseScCodeNm} ${school.zipAdres}\n`
+          console.log( school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres )
         })
       }).on('error', err => {
         throw TypeError(`Request failed: ${err}`)
