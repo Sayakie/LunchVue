@@ -28,14 +28,14 @@ export class IndexRoute extends BaseRoute {
    * @static
    */
   public static create(router: Router) {
-    console.log('[IndexRoute::Create] Creating index route.')
+    console.log('[IndexRoute] Creating index route.')
 
     router.get('/', (req: Request, res: Response) => {
       new IndexRoute().index(req, res)
     })
 
-    router.get('/find/:school', (req: Request, res: Response) => {
-      new IndexRoute().find(req, res)
+    router.get('/find/:school', (req: Request, res: Response, next: NextFunction) => {
+      new IndexRoute().find(req, res, next)
     })
   }
 
@@ -57,24 +57,31 @@ export class IndexRoute extends BaseRoute {
   }
 
   /**
-   * Test page route.
+   * Find some meals table in goverment, then return json
    * 
    * @class IndexRoute
-   * @method join
+   * @method find
    * @param req {Request} the express Request object.
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public async find(req: Request, res: Response) {
-    let DATA
-    res.setHeader('Content-Type', 'application/json')
-    new Promise((resolve, reject) => {
-      setTimeout(function() {
-        resolve(LunchVue.find(req.params.school))
+  public async find(req: Request, res: Response, next: NextFunction) {
+    const REQUEST = function() {
+      return new Promise((resolve, reject) => {
+        resolve(LunchVue.request2(req.params.school))
       })
-    }).then(data => {
-      console.log(data)
-      res.send(data)
-    })
+    }
+
+    await REQUEST()
+      .then(data => {
+        res.setHeader('Content-Type', 'application/json')
+        res.json(data)
+        next()
+      })
+      .catch(err => {
+        res.setHeader('Content-Type', 'text/plain')
+        res.status(404)
+        res.end()
+      })
   }
 }

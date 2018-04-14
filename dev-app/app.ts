@@ -71,8 +71,6 @@ class App {
   private configuration(): void {
     this.port = App.PORT
 
-    //
-    // <!-- Express Territory -->
     this.express.disable('x-powered-by')
     this.express.set('views', path.join(__dirname, '../views'))
     this.express.set('view engine', 'pug')
@@ -109,11 +107,11 @@ class App {
       const bind = (typeof this.port === 'string') ? `Pipe ${this.port}` : `Port ${this.port}`
       switch (e.code) {
         case 'EACCES':
-          console.error(`Permission denied. Requires elevated privileges`)
+          console.error(`[Server] Permission denied. Requires elevated privileges`)
           process.exit(1)
           break
         case 'EADDRINUSE':
-          console.error(`${bind} is already in use`)
+          console.error(`[Server] ${bind} is already in use`)
           process.exit(1)
           break
         default:

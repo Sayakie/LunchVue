@@ -1,5 +1,5 @@
 import * as request from 'request'
-//import { Response } from 'express'
+import * as request2 from 'then-request'
 
 class LunchVue {
   PREFIX: string
@@ -69,166 +69,83 @@ class LunchVue {
    * @public
    * @param school
    */
-  public async find(school: string) {
-    const QUERY = encodeURIComponent(school)
-    const PROMISE = []
-    const DATA = []
-
-    for (const DOMAIN of this.DOMAIN) {
-      PROMISE.push(new Promise((resolve, reject) => {
-        request({
-          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-          uri: `http://${DOMAIN}/spr_ccm_cm01_100.do?kraOrgNm=${QUERY}`,
-          headers: {
-            'User-Agent': 'lunchvue-request-bot'
-          },
-          gzip: true,
-          json: true
-        }, (err, response, body) => {
-          if (!err && response.statusCode == 200) {
-            body.resultSVO.orgDVOList.map( school => {
-                /*
-                console.log(JSON.stringify({
-                  name: school.kraOrgNm,
-                  code: school.orgCode,
-                  type: school.schulCrseScCodeNm,
-                  address: school.zipAdres
-                }))*/
-              resolve(JSON.stringify({
-                  name: school.kraOrgNm,
-                  code: school.orgCode,
-                  type: school.schulCrseScCodeNm,
-                  address: school.zipAdres
-              }))
-            })
-          } else {
-            reject(`Not Found: ${err}`)
-          }
-        }).on('error', err => {
-          reject(`Request failed: ${err}`)
-        })
-      }))
-    }
-
-    Promise.all(PROMISE)
-      .then(data => {
-        console.log(data)
-        return data
-      })
-      .catch(reason => {
-        console.error(reason)
-        return []
-      })
-    /*
-    for (const domain of this.DOMAIN) {
-      request({
-        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-        uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${encodeURIComponent(school)}`,
-        headers: {
-          'User-Agent': 'lunchvue-request-bot'
-        },
-        gzip: true,
-        json: true
-      }, (err, response, body) => {
-        if (!err && response.statusCode == 200) {
-          body.resultSVO.orgDVOList.map( school => {
-            console.log(JSON.stringify({
-              name: school.kraOrgNm,
-              code: school.orgCode,
-              type: school.schulCrseScCodeNm,
-              address: school.zipAdres
-            }))
-            return res.send(
-              JSON.stringify({
-                name: school.kraOrgNm,
-                code: school.orgCode,
-                type: school.schulCrseScCodeNm,
-                address: school.zipAdres
-              })
-            )
-          })
-        } else {
-          return res.send(404)
-        }
-      }).on('error', err => {
-        return console.error(`Request failed: ${err}`)
-      })
-    }*/
-
-    //return DATA
+  public find(school: string) {
+    this.request2(encodeURIComponent(school))
   }
 
   /**
+   * Parsing
    * 
    * @method request
    */
-  private async request(domain, query) {
-    const options = {
-      rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-      uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
-      headers: {
-        'User-Agent': 'lunchvue-request-bot'
-      },
-      gzip: true,
-      json: true
+  async request(school: string) {
+    const result: object[] = []
+
+    async function process(_domain: string[], _query: string) {
+      const promises = _domain.map(domain => {
+        // @ts-ignore
+        request2('GET', `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${encodeURIComponent(_query)}`, {
+          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+          headers: {
+            'User-Agent': 'lunchvue-agent'
+          },
+          json: true
+        }).done(res => {
+          result.push(res.getBody())
+        })
+      })
+
+      await Promise.all(promises)
+
+      console.log('===== Done')
+      console.log(`====================\n${result}`)
+      return result
     }
 
-    await request(options, (err, res, body) => {
-      if (err) {
-        return console.error(`No such dep: ${err}`)
-      }
-
-      body.resultSVO.orgDVOList.map( school => {
-        //console.log(school.kraOrgNm, school.orgCode, school.schulCrseScCodeNm, school.zipAdres)
-        return {
-          name: school.kraOrgNm,
-          code: school.orgCode,
-          type: school.schulCrseScCodeNm,
-          address: school.zipAdres
-        }
-      })
-    }).on('error', err => {
-      console.error(`Request failed: ${err}`)
-    })
+    await process(this.DOMAIN, school)
   }
 
   /**
    * 
    * @method reqeust2
    */
-  private request2(query) {
-    for (const domain of this.DOMAIN) {
-      request({
-        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-        uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
-        headers: {
-          'User-Agent': 'lunchvue-request-bot'
-        },
-        gzip: true,
-        json: true
-      }, (err, res, body) => {
-        if (err) {
-          return console.error(`No such dep: ${err}`)
-        }
-  
-        body.resultSVO.orgDVOList.map( school => {
-          console.log(JSON.stringify({
-            name: school.kraOrgNm,
-            code: school.orgCode,
-            type: school.schulCrseScCodeNm,
-            address: school.zipAdres
-          }))
-          return JSON.stringify({
-            name: school.kraOrgNm,
-            code: school.orgCode,
-            type: school.schulCrseScCodeNm,
-            address: school.zipAdres
+  async request2(school: string) {
+    const result: object[] = []
+
+    async function process(_domain, query) {
+      const promises = _domain.map(domain => {
+        request({
+          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+          uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+          headers: {
+            'User-Agent': 'lunchvue-request-bot'
+          },
+          gzip: true,
+          json: true
+        }, (err, res, body) => {
+          body.resultSVO.orgDVOList.map( school => {
+            result.push({
+              name: school.kraOrgNm,
+              code: school.orgCode,
+              type: school.schulCrseScCodeNm,
+              address: school.zipAdres
+            })
           })
+        }).on('error', err => {
+          console.error(`Request failed: ${err}`)
         })
-      }).on('error', err => {
-        console.error(`Request failed: ${err}`)
       })
+
+      await Promise.all(promises)
+            .then(result => {
+              return JSON.stringify(result)
+            })
+            .catch(err => {
+              return []
+            })
     }
+
+    await process(this.DOMAIN, encodeURIComponent(school))
   }
 }
 
