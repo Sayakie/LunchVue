@@ -1,10 +1,23 @@
+::selection
+  background: $selector-background
+  color: $selector-color
+  
 body 
   background: $default-background
   color: $default-color
 
+header, footer
+  display: flex
+  position: fixed
+  align-items: center
+
 header
+  top: 0
+  width: 100vw
+  min-height: 5vh
   background: $header-background-default
   @include background(linear-gradient(to top, $header-background-default, $header-background-highlight))
+  z-index: 9500
 
 .header-title
   padding: 0
@@ -12,3 +25,22 @@ header
     font-size: 1.75rem
     text-align: center
     padding: 20px
+
+footer
+  bottom: 0
+  width: 100vw
+  height: 6.5vh
+  background: #fff
+  color: #000
+  z-index: 1000
+
+footer
+  display: none
+
+.footer-title
+  i
+    margin-right: 5px
+
+.footer-meta
+  span
+    margin: 0 4px

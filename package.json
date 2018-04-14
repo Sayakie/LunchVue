@@ -11,7 +11,8 @@
     "dev:watch": "ts-node dev-app/index.ts",
     "sass": "node-sass --output-style compressed assets/src/sass/app.sass -o assets/dist",
     "sass:watch": "nodemon -e sass -w ./assets/src/sass -x yarn run sass",
-    "ts": "tsc -p assets/src/ts/tsconfig.json"
+    "js": "babel assets/src --out-file assets/dist/app.js --source-maps inline",
+    "js:watch": "babel assets/src --watch --out-file assets/dist/app.js --source-maps inline"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -31,6 +32,7 @@
     "@types/request": "^2.47.0",
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "babel-preset-minify": "^0.4.0",
     "bootstrap": "4.1.0",
     "compass-mixins": "^0.12.10",
     "node-sass": "^4.8.3",

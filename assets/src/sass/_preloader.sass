@@ -1,0 +1,53 @@
+#preloader
+  position: fixed
+  width: 100vw
+  height: 100vh
+  background-color: #101418
+  transition: opacity 0.4s
+  z-index: 5000
+
+  &.loaded
+    opacity: 0
+
+  .spinner
+    @include animation(rotate 10s infinite linear)
+    display: block
+    position: relative
+    margin: auto
+    $size: $preloader-inner + length($preloader-colors) * ($preloader-border + $preloader-spacing) * 2
+
+    top: 50%
+    width: $size
+    height: $size
+    margin-top: -$size / 2
+
+    i 
+      @include animation(rotate 3s infinite cubic-bezier(0.09, 0.6, 0.8, 0.03))
+      @include transform-origin(50%, 100%, 0)
+      display: inline-block
+      position: absolute
+      top: 50%
+      left: 50%
+      border: solid $preloader-border transparent
+      border-bottom: none
+
+      @each $current in $preloader-colors 
+        $i: index($preloader-colors, $current)
+
+        &:nth-child(#{$i})
+          $size: $preloader-inner + $i * ($preloader-border + $preloader-spacing) * 2
+
+          @include animation-timing-function(cubic-bezier(0.09, 0.3 * $i, 0.12 * $i, 0.03))
+
+          width: $size
+          height: $size / 2
+          margin-top: -$size / 2
+          margin-left: -$size / 2
+          border-color: $current
+          border-top-left-radius: $preloader-inner + $i * $preloader-border
+          border-top-right-radius: $preloader-inner + $i * $preloader-border
+
+@include keyframes(rotate) 
+  to 
+    @include rotate(360deg)
+  
