@@ -19,7 +19,8 @@ html(lang='ko')
       To prevent duplicate URLs, specify a standard page,
       and set dns-prefetch to improve the speed of redirects
     link(rel='canonical' href=URL)
-    link(rel='dns-prefetch' href='//lunchvue.doroshi.ml')
+    link(rel='dns-prefetch' href='//kurosnape.github.io')
+    link(rel='dns-prefecth' href='//stackpath.bootstrapcdn.com')
     link(rel='dns-prefecth' href='//fonts.googleapis.com')
     //-
       Declare an app manifest to app can:
@@ -62,10 +63,20 @@ html(lang='ko')
       |   "url": "#{BASE_URL}"
       | }
     //- Stylesheets & Scripts
+    link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css")
     link(rel="stylesheet", href="assets/app.css")
+    script(src="https://kurosnape.github.io/assets/jquery-3.3.1.js")
   body
     main
-      section#perloader
+      section#preloader
+        .spinner
+          i
+          i
+          i
+          i
+          i
+          i
+          i
       section#main
         header
           .container-fluid
@@ -77,10 +88,12 @@ html(lang='ko')
         footer
           .container-fluid
             .row
-              .footer.col-12
-                .footer-title.col-8
-                  span [School Title]
-                .footer-meta.col-4
-                  span.current-date 04월 14일
-                  span.prev 이전
-                  span.next 다음
+              .footer-title.col-8
+                i.fa.fa-fw.fa-suitcase
+                span.title [##__TITLE__##]
+              .footer-meta.text-right.col
+                span.date [##__DATE__##]
+                span.prev
+                  i.fa.fa-fw.fa-chevron-left
+                span.next
+                  i.fa.fa-fw.fa-chevron-right
