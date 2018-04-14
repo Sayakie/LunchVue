@@ -29,6 +29,8 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.6.2",
     "@types/request": "^2.47.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
     "bootstrap": "4.1.0",
     "compass-mixins": "^0.12.10",
     "node-sass": "^4.8.3",
