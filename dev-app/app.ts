@@ -69,7 +69,8 @@ class App {
    * @method configuration
    */
   private configuration(): void {
-    const EXPIRE = (process.env.NODE_ENV !== 'development') ? 31557600000 : 0
+    // cache for 24 hours
+    const EXPIRE = (process.env.NODE_ENV !== 'development') ? 86400 * 1000 : 0
     this.port = App.PORT
 
     this.express.disable('x-powered-by')
