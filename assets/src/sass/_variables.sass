@@ -1,0 +1,19 @@
+//
+// # Set vw, vw
+// =======================================================
+$percent: 25 50 75 100
+@each $current in $percent
+  .vw#{$current} 
+    width: #{$current}vw
+
+  .vh#{$current}
+    height: #{$current}vh
+
+//
+// # Default variables
+// =======================================================
+$default-background:          #232527
+$default-color:               $gray-100
+
+$header-background-default:   #cc2000
+$header-background-highlight: #e14e32

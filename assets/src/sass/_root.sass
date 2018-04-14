@@ -1,0 +1,14 @@
+body 
+  background: $default-background
+  color: $default-color
+
+header
+  background: $header-background-default
+  @include background(linear-gradient(to top, $header-background-default, $header-background-highlight))
+
+.header-title
+  padding: 0
+  h1
+    font-size: 1.75rem
+    text-align: center
+    padding: 20px
