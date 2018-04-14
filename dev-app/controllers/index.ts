@@ -34,8 +34,8 @@ export class IndexRoute extends BaseRoute {
       new IndexRoute().index(req, res)
     })
 
-    router.get('/find/:school', (req: Request, res: Response, next: NextFunction) => {
-      new IndexRoute().find(req, res, next)
+    router.get('/find/:school', (req: Request, res: Response) => {
+      new IndexRoute().find(req, res)
     })
   }
 
@@ -65,23 +65,8 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public async find(req: Request, res: Response, next: NextFunction) {
-    const REQUEST = function() {
-      return new Promise((resolve, reject) => {
-        resolve(LunchVue.request2(req.params.school))
-      })
-    }
-
-    await REQUEST()
-      .then(data => {
-        res.setHeader('Content-Type', 'application/json')
-        res.json(data)
-        next()
-      })
-      .catch(err => {
-        res.setHeader('Content-Type', 'text/plain')
-        res.status(404)
-        res.end()
-      })
+  public find(req: Request, res: Response) {
+    res.setHeader('Content-Type', 'application/json')
+    res.json(LunchVue.request2(req.params.school))
   }
 }

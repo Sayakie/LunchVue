@@ -5,6 +5,7 @@
     "sourceMap": true,
     "removeComments": true,
     "noUnusedParameters": true,
+    "noUnusedLocals": false,
     "outDir": "app",
     "baseUrl": ".",
     "paths": {

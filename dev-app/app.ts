@@ -69,6 +69,7 @@ class App {
    * @method configuration
    */
   private configuration(): void {
+    const EXPIRE = (!process.env.NODE_ENV) ? 31557600000 : 0
     this.port = App.PORT
 
     this.express.disable('x-powered-by')
@@ -78,8 +79,8 @@ class App {
     this.express.use(logger('dev'))
     this.express.use(bodyParser.json())
     this.express.use(bodyParser.urlencoded({ extended: false }))
-    this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: 31557600000 }))
-    this.express.use('/', express.static(path.join(__dirname, '../assets/static'), { maxAge: 31557600000 }))
+    this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: EXPIRE }))
+    this.express.use('/', express.static(path.join(__dirname, '../assets/public'), { maxAge: EXPIRE }))
 
     // Catch 404 and forward to error handler
     this.express.use((err: IError, req: express.Request, res: express.Response, next: express.NextFunction) => {

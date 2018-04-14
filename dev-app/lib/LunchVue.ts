@@ -73,70 +73,54 @@ class LunchVue {
   }
 
   /**
-   * Parsing
-   * 
-   * @method request
-   */
-  async request(school: string) {
-    const result: object[] = []
-
-    async function process(_domain: string[], _query: string) {
-      const promises = _domain.map(domain => {
-        // @ts-ignore
-        request2('GET', `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${encodeURIComponent(_query)}`, {
-          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-          headers: {
-            'User-Agent': 'lunchvue-agent'
-          },
-          json: true
-        }).done(res => {
-          result.push(res.getBody())
-        })
-      })
-
-      await Promise.all(promises)
-
-      console.log('===== Done')
-      console.log(`====================\n${result}`)
-      return result
-    }
-
-    await process(this.DOMAIN, school)
-  }
-
-  /**
    * 
    * @method reqeust2
    */
-  async request2(school: string) {
+  public request2(school: string) {
+    const promises: object[] = []
     const result: object[] = []
 
     async function process(_domain, query) {
-      const promises = _domain.map(domain => {
-        request({
-          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-          uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
-          headers: {
-            'User-Agent': 'lunchvue-request-bot'
-          },
-          gzip: true,
-          json: true
-        }, (err, res, body) => {
-          body.resultSVO.orgDVOList.map( school => {
-            result.push({
-              name: school.kraOrgNm,
-              code: school.orgCode,
-              type: school.schulCrseScCodeNm,
-              address: school.zipAdres
+      _domain.map(domain => {
+        return promises.push(
+          new Promise((resolve, reject) => {
+            request({
+              rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+              uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
+              headers: {
+                'User-Agent': 'lunchvue-request-bot'
+              },
+              gzip: true,
+              json: true
+            }, (err, res, body) => {
+              if (err) {
+                reject(err)
+              } else if (res.statusCode == 200) {
+                body.resultSVO.orgDVOList.map(school => {
+                  console.log(JSON.stringify({
+                    name: school.kraOrgNm,
+                    code: school.orgCode,
+                    type: school.schulCrseScCodeNm,
+                    address: school.zipAdres
+                  }))
+                  resolve({
+                    name: school.krgOrgNm,
+                    code: school.orgCode,
+                    type: school.schulCrseScCodeNm,
+                    address: school.zipAdres
+                  })
+                })
+              }
+            }).on('error', err => {
+              console.error(`Request failed: ${err}`)
             })
           })
-        }).on('error', err => {
-          console.error(`Request failed: ${err}`)
-        })
+        )
       })
 
       await Promise.all(promises)
             .then(result => {
+              console.log(JSON.stringify(result))
               return JSON.stringify(result)
             })
             .catch(err => {
@@ -144,7 +128,7 @@ class LunchVue {
             })
     }
 
-    await process(this.DOMAIN, encodeURIComponent(school))
+    return process(this.DOMAIN, encodeURIComponent(school))
   }
 }
 

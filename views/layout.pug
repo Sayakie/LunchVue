@@ -62,5 +62,25 @@ html(lang='ko')
       |   "url": "#{BASE_URL}"
       | }
     //- Stylesheets & Scripts
+    link(rel="stylesheet", href="assets/app.css")
   body
-    block content
+    main
+      section#perloader
+      section#main
+        header
+          .container-fluid
+            .row
+              .header.col-12
+                .header-title.col-12
+                  h1 전국 급식 식단표
+        block content
+        footer
+          .container-fluid
+            .row
+              .footer.col-12
+                .footer-title.col-8
+                  span [School Title]
+                .footer-meta.col-4
+                  span.current-date 04월 14일
+                  span.prev 이전
+                  span.next 다음

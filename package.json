@@ -8,7 +8,10 @@
   "scripts": {
     "start": "node ./app/index.js",
     "dev": "nodemon -e ts -w ./dev-app -x yarn run dev:watch",
-    "dev:watch": "ts-node dev-app/index.ts"
+    "dev:watch": "ts-node dev-app/index.ts",
+    "sass": "node-sass --output-style compressed assets/src/sass/app.sass -o assets/dist",
+    "sass:watch": "nodemon -e sass -w ./assets/src/sass -x yarn run sass",
+    "ts": "tsc -p assets/src/ts/tsconfig.json"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -26,6 +29,9 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^9.6.2",
     "@types/request": "^2.47.0",
+    "bootstrap": "4.1.0",
+    "compass-mixins": "^0.12.10",
+    "node-sass": "^4.8.3",
     "nodemon": "^1.17.3",
     "ts-node": "^5.0.1",
     "typescript": "^2.8.1"
