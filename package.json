@@ -11,8 +11,11 @@
     "dev:watch": "ts-node dev-app/index.ts",
     "sass": "node-sass --output-style compressed assets/src/sass/app.sass -o assets/dist",
     "sass:watch": "nodemon -e sass -w ./assets/src/sass -x yarn run sass",
-    "js": "babel assets/src --out-file assets/dist/app.js --source-maps inline",
-    "js:watch": "babel assets/src --watch --out-file assets/dist/app.js --source-maps inline"
+    "js": "yarn run js:compile && yarn run js:copy",
+    "js:compile": "babel assets/src/js --out-file assets/dist/app.js --source-maps inline --ignore assets/src/js/origin",
+    "js:compile.old": "babel assets/src/js --out-file assets/dist/app.js --source-maps inline --ignore assets/src/js/origin --comments=false --compact=true --minified=true",
+    "js:copy": "babel assets/src/js/origin --out-dir assets/dist --copy-files",
+    "js:watch": "nodemon -e js -w ./assets/src/js -x yarn run js:compile"
   },
   "dependencies": {
     "body-parser": "^1.18.2",
