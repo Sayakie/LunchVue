@@ -65,10 +65,16 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public find(req: Request, res: Response) {
+  public async find(req: Request, res: Response) {
+    let DATA
     res.setHeader('Content-Type', 'application/json')
-    const DATA = LunchVue.find(req.params.school)
-    console.log(`====> ${DATA}`)
-    setTimeout(() => {res.send(DATA)}, 3000)
+    new Promise((resolve, reject) => {
+      setTimeout(function() {
+        resolve(LunchVue.find(req.params.school))
+      })
+    }).then(data => {
+      console.log(data)
+      res.send(data)
+    })
   }
 }

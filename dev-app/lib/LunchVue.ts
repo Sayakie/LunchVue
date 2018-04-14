@@ -1,4 +1,5 @@
 import * as request from 'request'
+//import { Response } from 'express'
 
 class LunchVue {
   PREFIX: string
@@ -68,25 +69,93 @@ class LunchVue {
    * @public
    * @param school
    */
-  public find(school: string) {
+  public async find(school: string) {
+    const QUERY = encodeURIComponent(school)
+    const PROMISE = []
     const DATA = []
-    /*
-    for (const i in this.DOMAIN) {
-      this.request(this.DOMAIN[i], QUERY).then(data => {
+
+    for (const DOMAIN of this.DOMAIN) {
+      PROMISE.push(new Promise((resolve, reject) => {
+        request({
+          rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+          uri: `http://${DOMAIN}/spr_ccm_cm01_100.do?kraOrgNm=${QUERY}`,
+          headers: {
+            'User-Agent': 'lunchvue-request-bot'
+          },
+          gzip: true,
+          json: true
+        }, (err, response, body) => {
+          if (!err && response.statusCode == 200) {
+            body.resultSVO.orgDVOList.map( school => {
+                /*
+                console.log(JSON.stringify({
+                  name: school.kraOrgNm,
+                  code: school.orgCode,
+                  type: school.schulCrseScCodeNm,
+                  address: school.zipAdres
+                }))*/
+              resolve(JSON.stringify({
+                  name: school.kraOrgNm,
+                  code: school.orgCode,
+                  type: school.schulCrseScCodeNm,
+                  address: school.zipAdres
+              }))
+            })
+          } else {
+            reject(`Not Found: ${err}`)
+          }
+        }).on('error', err => {
+          reject(`Request failed: ${err}`)
+        })
+      }))
+    }
+
+    Promise.all(PROMISE)
+      .then(data => {
         console.log(data)
-        DATA.push(data)
+        return data
+      })
+      .catch(reason => {
+        console.error(reason)
+        return []
+      })
+    /*
+    for (const domain of this.DOMAIN) {
+      request({
+        rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+        uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${encodeURIComponent(school)}`,
+        headers: {
+          'User-Agent': 'lunchvue-request-bot'
+        },
+        gzip: true,
+        json: true
+      }, (err, response, body) => {
+        if (!err && response.statusCode == 200) {
+          body.resultSVO.orgDVOList.map( school => {
+            console.log(JSON.stringify({
+              name: school.kraOrgNm,
+              code: school.orgCode,
+              type: school.schulCrseScCodeNm,
+              address: school.zipAdres
+            }))
+            return res.send(
+              JSON.stringify({
+                name: school.kraOrgNm,
+                code: school.orgCode,
+                type: school.schulCrseScCodeNm,
+                address: school.zipAdres
+              })
+            )
+          })
+        } else {
+          return res.send(404)
+        }
+      }).on('error', err => {
+        return console.error(`Request failed: ${err}`)
       })
     }*/
 
-    DATA.push(this.request2(encodeURIComponent(school)))
-
-    /*return JSON.stringify([{"name":"덕인초등학교","code":"J100005395","type":"초등학교","address":"경기도 안산시 단원구 와동 1~400"},
-    {"name":"목포덕인중학교","code":"Q100000827","type":"중학교","address":"전라남도 목포시 죽교동 1~93"},
-    {"name":"목포덕인고등학교","code":"Q100000199","type":"고등학교","address":"전라남도 목포시 죽교동 1~93"},
-    {"name":"대구덕인초등학교병설유치원","code":"D100000484","type":"유치원","address":"대구광역시 달서구 본리동"},
-    {"name":"대구덕인초등학교","code":"D100000423","type":"초등학교","address":"대구광역시 달서구 본리동"}])*/
-    console.log(`DATA: ${DATA}`)
-    return DATA
+    //return DATA
   }
 
   /**
