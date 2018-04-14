@@ -16,6 +16,12 @@ class Validator {
             return false;
         }
     }
+    *asyncMiddleware(fn) {
+        (req, res, next) => {
+            Promise.resolve(fn(req, res, next))
+                .catch(next);
+        };
+    }
 }
 exports.default = Validator.bootstrap();
 //# sourceMappingURL=Validator.js.map

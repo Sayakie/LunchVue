@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class BaseRoute {
     constructor() {
-        this.title = "LunchVue";
         this.scripts = [];
     }
     addScript(src) {

@@ -25,6 +25,7 @@ class App {
         this.server = http_1.createServer(this.express);
     }
     configuration() {
+        const EXPIRE = (!process.env.NODE_ENV) ? 31557600000 : 0;
         this.port = App.PORT;
         this.express.disable('x-powered-by');
         this.express.set('views', path.join(__dirname, '../views'));
@@ -33,8 +34,8 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
-        this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: 31557600000 }));
-        this.express.use('/', express.static(path.join(__dirname, '../assets/static'), { maxAge: 31557600000 }));
+        this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: EXPIRE }));
+        this.express.use('/', express.static(path.join(__dirname, '../assets/public'), { maxAge: EXPIRE }));
         this.express.use((err, req, res, next) => {
             err.status = 404;
             next(err);
@@ -51,11 +52,11 @@ class App {
             const bind = (typeof this.port === 'string') ? `Pipe ${this.port}` : `Port ${this.port}`;
             switch (e.code) {
                 case 'EACCES':
-                    console.error(`Permission denied. Requires elevated privileges`);
+                    console.error(`[Server] Permission denied. Requires elevated privileges`);
                     process.exit(1);
                     break;
                 case 'EADDRINUSE':
-                    console.error(`${bind} is already in use`);
+                    console.error(`[Server] ${bind} is already in use`);
                     process.exit(1);
                     break;
                 default:
