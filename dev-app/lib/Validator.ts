@@ -1,16 +1,14 @@
-class Validator {
-  /**
-   * Bootstrap the validator
-   */
-  public static bootstrap() {
-    return new Validator()
+export class Validator {
+  private static instance: Validator
+
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new Validator()
+    }
+
+    return this.instance
   }
 
-  /**
-   * Takes a {val} into a number, string or false
-   * 
-   * @param val string to test.
-   */
   public normalizePort(val: number | string): number | string | boolean {
     const port: number = (typeof val === 'string') ? parseInt(val, 10) : val
 
@@ -25,9 +23,6 @@ class Validator {
   
   /**
    * Takes another function and wraps it in a promise
-   * 
-   * @class Validator
-   * @method asyncMiddleware
    */
   public* asyncMiddleware(fn): any {
     (req, res, next) => {
@@ -36,5 +31,3 @@ class Validator {
     }
   }
 }
-
-export default Validator.bootstrap()

@@ -1,85 +1,32 @@
 import * as request from 'request'
 
-class LunchVue {
-  PREFIX: string
-  TYPE: object
-  SUFFIX: string
-  DOMAIN: string[]
-  DATA: object[]
+interface Domain {
+  readonly name: string
+  readonly ltd?: string
+}
 
-  constructor() {
-    this.init()
-  }
+interface Spread {
+  readonly name: string
+  readonly code: string
+  readonly type: string
+  readonly address: string
+}
 
-  /**
-   * Bootstrap the LunchVue Library.
-   * 
-   * @method bootstrap
-   * @return {LunchVue}
-   */
-  public static bootstrap() {
+export class LunchVue {
+  private static instance: LunchVue
+
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new LunchVue()
+    }
+
     return new LunchVue()
   }
 
-  /**
-   * Initialize LunchVue
-   * 
-   * @private
-   */
-  private init() {
-    this.PREFIX = 'stu.'
-    this.SUFFIX = '.go.kr'
-    this.TYPE = [
-      'sen',  // 서울특별시
-      'pen',  // 부산광역시
-      'dge',  // 대구광역시
-      'ice',  // 인천광역시
-      'gen',  // 광주광역시
-      'dje',  // 대전광역시
-      'use',  // 울산광역시
-      'sje',  // 세종특별자치시
-      'goe',  // 경기도
-      'gwe',  // 강원도
-      'cbe',  // 충청북도
-      'cne',  // 충청남도
-      'jbe',  // 전라북도
-      'jne',  // 전라남도
-      'gbe',  // 경상북도
-      'gne',  // 경상남도
-      'jje'   // 제주도
-    ]
-    this.DOMAIN = []
-    this.DATA = []
+  private readonly domainList = this.initialiseDomainList()
 
-    for (const i in this.TYPE) {
-      // Because Gyeongsangbuk-do(경상북도) use different domain
-      if (this.TYPE[i] === 'gbe') {
-        this.DOMAIN.push(this.PREFIX + this.TYPE[i] + '.kr')
-        continue
-      }
-
-      this.DOMAIN.push(this.PREFIX + this.TYPE[i] + this.SUFFIX)
-    }
-  }
-
-  /**
-   * find
-   * 
-   * @public
-   * @param school
-   */
-  public find(school: string) {
-    this.request2(encodeURIComponent(school))
-  }
-
-  /**
-   * 
-   * @method reqeust2
-   */
-  async request2(school: string) {
-    const query = encodeURIComponent(school)
-    const payload = {
-      uri: '',
+  private get payload (): request.CoreOptions {
+    return {
       rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
       gzip: true,
       json: true,
@@ -87,45 +34,69 @@ class LunchVue {
         'User-Agent': 'lunchvue-request-bot'
       }
     }
+  }
 
-    const resultList = this.DOMAIN.map((domain): Promise<any[]> =>
-      new Promise((resolve, reject): void => {
-        payload.uri = `http://${ domain }/spr_ccm_cm01_100.do?kraOrgNm=${ query }`
+  public async find(school: string): Promise<Spread[][]> {
+    const query = encodeURIComponent(school)
+    const payload = this.payload
 
-        const validator = (error, res, body): void => {
-          if (error) {
-            reject(error)
-            return
-          }
+    const requestList = this.domainList.map(async (domain): Promise<Spread[]> => {
+      const uri = `http://${ domain }/spr_ccm_cm01_100.do?kraOrgNm=${ query }`
+      const payload: request.CoreOptions & request.UriOptions = { ...this.payload, uri }
 
-          if (res.statusCode !== 200) {
-            const message = 'invalid request'
-            const reason = new Error(message)
-            reject(reason)
-            return
-          }
+      const response = await this.request(payload)
+      const data: any[] = response.resultSVO.orgDVOList
+      const spreadList: Spread[] = data.map((spread): Spread => {
+        const {
+          kraOrgNm: name,
+          orgCode: code,
+          schulCrseScCodeNm: type,
+          zipAdres: address
+        } = spread
 
-          const data = body.resultSVO.orgDVOList
-          const spreadList = data.map((spread) => {
-            const {
-              kraOrgNm: name,
-              orgCode: code,
-              schulCrseScCodeNm: type,
-              zipAdres: address
-            } = spread
+        return { name, code, type, address }
+      })
 
-            return { name, code, type, address }
-          })
+      return spreadList
+    })
 
-          resolve(spreadList)
-        }
+    const resultList = await Promise.all(requestList)
+      .then((result: Spread[][]) =>
+        result.filter((data): boolean => (!!data.length))
+      )
 
-        request(payload, validator)
-      }))
+    return resultList
+  }
 
-    const result = await Promise.all(resultList)
-    return result.filter((data): boolean => (data.length !== 0))
+  private initialiseDomainList(): string[] {
+    const PREFIX = 'stu'
+    const SUFFIX = 'go.kr'
+    const domainList: Domain[] = [
+      { name: 'sen' }, // 서울특별시
+      { name: 'pen' }, // 부산광역시
+      { name: 'dge' }, // 대구광역시
+      { name: 'ice' }, // 인천광역시
+      { name: 'gen' }, // 광주광역시
+      { name: 'dje' }, // 대전광역시
+      { name: 'use' }, // 울산광역시
+      { name: 'sje' }, // 세종특별자치시
+      { name: 'goe' }, // 경기도
+      { name: 'gwe' }, // 강원도
+      { name: 'cbe' }, // 충청북도
+      { name: 'cne' }, // 충청남도
+      { name: 'jbe' }, // 전라북도
+      { name: 'jne' }, // 전라남도
+      { name: 'gbe', ltd: 'kr' }, // 경상북도
+      { name: 'gne' }, // 경상남도
+      { name: 'jje' } // 제주도
+    ]
+
+    return domainList.map(({ name, ltd }): string => [PREFIX, name, (ltd) || SUFFIX].join('.'))
+  }
+
+  private request (payload: request.CoreOptions & (request.UriOptions | request.UrlOptions)): Promise<any> {
+    return new Promise((resolve, reject): void => {
+      request(payload, (error, _, body) => (error) ? reject(error) : resolve(body))
+    })
   }
 }
-
-export default LunchVue.bootstrap()
