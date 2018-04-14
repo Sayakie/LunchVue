@@ -1,5 +1,4 @@
 import * as request from 'request'
-import * as request2 from 'then-request'
 
 class LunchVue {
   PREFIX: string
