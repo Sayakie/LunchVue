@@ -76,59 +76,55 @@ class LunchVue {
    * 
    * @method reqeust2
    */
-  public request2(school: string) {
-    const promises: object[] = []
-    const result: object[] = []
-
-    async function process(_domain, query) {
-      _domain.map(domain => {
-        return promises.push(
-          new Promise((resolve, reject) => {
-            request({
-              rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
-              uri: `http://${domain}/spr_ccm_cm01_100.do?kraOrgNm=${query}`,
-              headers: {
-                'User-Agent': 'lunchvue-request-bot'
-              },
-              gzip: true,
-              json: true
-            }, (err, res, body) => {
-              if (err) {
-                reject(err)
-              } else if (res.statusCode == 200) {
-                body.resultSVO.orgDVOList.map(school => {
-                  console.log(JSON.stringify({
-                    name: school.kraOrgNm,
-                    code: school.orgCode,
-                    type: school.schulCrseScCodeNm,
-                    address: school.zipAdres
-                  }))
-                  resolve({
-                    name: school.krgOrgNm,
-                    code: school.orgCode,
-                    type: school.schulCrseScCodeNm,
-                    address: school.zipAdres
-                  })
-                })
-              }
-            }).on('error', err => {
-              console.error(`Request failed: ${err}`)
-            })
-          })
-        )
-      })
-
-      await Promise.all(promises)
-            .then(result => {
-              console.log(JSON.stringify(result))
-              return JSON.stringify(result)
-            })
-            .catch(err => {
-              return []
-            })
+  async request2(school: string) {
+    const query = encodeURIComponent(school)
+    const payload = {
+      uri: '',
+      rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
+      gzip: true,
+      json: true,
+      headers: {
+        'User-Agent': 'lunchvue-request-bot'
+      }
     }
 
-    return process(this.DOMAIN, encodeURIComponent(school))
+    const resultList = this.DOMAIN.map((domain): Promise<any[]> =>
+      new Promise((resolve, reject): void => {
+        payload.uri = `http://${ domain }/spr_ccm_cm01_100.do?kraOrgNm=${ query }`
+
+        const validator = (error, res, body): void => {
+          if (error) {
+            reject(error)
+            return
+          }
+
+          if (res.statusCode !== 200) {
+            const message = 'invalid request'
+            const reason = new Error(message)
+            reject(reason)
+            return
+          }
+
+          const data = body.resultSVO.orgDVOList
+          const spreadList = data.map((spread) => {
+            const {
+              kraOrgNm: name,
+              orgCode: code,
+              schulCrseScCodeNm: type,
+              zipAdres: address
+            } = spread
+
+            return { name, code, type, address }
+          })
+
+          resolve(spreadList)
+        }
+
+        request(payload, validator)
+      }))
+
+    const result = await Promise.all(resultList)
+    return result.filter((data): boolean => (data.length !== 0))
   }
 }
 
