@@ -1,5 +1,10 @@
 import * as request from 'request'
 
+/**
+ * LunchVue Server Library v0.1.4 (https://github.com/Kurosnape/LunchVue/)
+ * Copyright 2018 LunchVue Authors
+ * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
+ */
 class LunchVue {
   PREFIX: string
   TYPE: object

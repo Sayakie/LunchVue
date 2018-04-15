@@ -1,3 +1,8 @@
+/**
+ * LunchVue Client Library v0.1.10 (https://github.com/Kurosnape/LunchVue/)
+ * Copyright 2018 LunchVue Authors
+ * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
+ */
 class LunchVue {
   constructor() {
     this.initVariables()
@@ -127,7 +132,28 @@ class LunchVue {
     localStorage.schoolId = query.code
     localStorage.schoolName = query.name
     this.$searchSchool.modal('hide')
+    this.getMeals()
     this.loadAddition()
+  }
+
+  /**
+   * Get meals
+   * 
+   * @class LunchVue
+   * @method getMeals
+   */
+  getMeals() {
+    $.ajax({
+      type: 'GET',
+      url: `/get/${localStorage.schoolId}`,
+      dataType: 'JSON',
+      success: (data) => {
+        localStorage.meals = JSON.stringify(data)
+      },
+      error: () => {
+        this.displayAlert('error', '서버와 연결을 실패했습니다. 식단을 가져올 수 없습니다.')
+      }
+    })
   }
 
   /**
