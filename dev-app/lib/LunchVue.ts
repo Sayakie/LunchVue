@@ -14,16 +14,20 @@ class LunchVue {
   /**
    * Bootstrap the LunchVue Library.
    * 
+   * @class bootstrap
    * @method bootstrap
+   * @static
    * @return {LunchVue}
    */
-  public static bootstrap() {
+  public static bootstrap(): LunchVue {
     return new LunchVue()
   }
 
   /**
    * Initialize LunchVue
    * 
+   * @class LunchVue
+   * @method init
    * @private
    */
   private init() {
@@ -63,17 +67,9 @@ class LunchVue {
   }
 
   /**
-   * find
+   * Ask all education offices to check there is a school.
    * 
-   * @public
-   * @param school
-   */
-  public find(school: string) {
-    this.request2(encodeURIComponent(school))
-  }
-
-  /**
-   * 
+   * @class LunchVue
    * @method reqeust2
    */
   async request2(school: string) {
@@ -125,6 +121,16 @@ class LunchVue {
 
     const result = await Promise.all(resultList)
     return result.filter((data): boolean => (data.length !== 0))
+  }
+
+  /**
+   * Get meals from government.
+   * 
+   * @class LunchVue
+   * @method get
+   */
+  public get() {
+
   }
 }
 

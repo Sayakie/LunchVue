@@ -34,6 +34,7 @@ class LunchVue {
    */
   loadVariables() {
     this.now = new Date()
+    this.$header = $('.header-title')
     this.$device = $('footer')
     this.$school = $('.footer-title .title')
     this.$date = $('.footer-meta .date')
@@ -44,7 +45,7 @@ class LunchVue {
   }
 
   /**
-   * Initiate additional functions, variables
+   * Initiate additional functions, variables.
    * 
    * @class LunchVue
    * @method loadAddition
@@ -58,7 +59,7 @@ class LunchVue {
       this.$device.css('display', 'flex')
       this.$school.html(this.schoolName)
       this.$date.html(`${this.now.getFullYear()}. ${this.now.getMonth() + 1}. ${this.now.getDate()}`)
-      this.drawTable(this.meals)
+      //this.drawTable(this.meals)
     } else {
       this.appendSearchModal()
     }
@@ -86,14 +87,16 @@ class LunchVue {
    */
   appendSearchModal() {
     this.$searchSchool.modal('show')
-    this.$searchSchoolFocusing.focus()
+    this.$searchSchoolFocusing.val('').focus()
+    this.$searchResult.html('')
   }
 
   /**
-   * Apeend school lists
+   * Apeend school lists.
    * 
    * @class LunchVue
    * @method drawSchoolList
+   * @param {data} object - A bundle of school objects to show
    */
   drawSchoolList(data) {
     const schoolList = []
@@ -117,12 +120,14 @@ class LunchVue {
    * 
    * @class LunchVue
    * @method setSchool
+   * @param {query} object - The JSON object, including school code and name
    */
   setSchool(query) {
     localStorage.isHave = true
     localStorage.schoolId = query.code
     localStorage.schoolName = query.name
     this.$searchSchool.modal('hide')
+    this.loadAddition()
   }
 
   /**
@@ -149,6 +154,12 @@ class LunchVue {
         }
       })
       e.preventDefault()
+    })
+    this.$header.bind('click', () => {
+      this.appendSearchModal()
+    })
+    this.$school.bind('click', () => {
+      this.appendSearchModal()
     })
 
     // The dynamically created elements bind events in a different way.

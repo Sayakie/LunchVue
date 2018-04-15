@@ -55,8 +55,9 @@ class App {
    * 
    * @class App
    * @method initialization
+   * @private
    */
-  private initialization(): void {
+  private initialization() {
     this.express = express()
     this.server = createServer(this.express)
     // this.socket = socketIO(this.server)
@@ -67,6 +68,7 @@ class App {
    * 
    * @class App
    * @method configuration
+   * @private
    */
   private configuration(): void {
     // cache for 24 hours
@@ -93,10 +95,12 @@ class App {
   }
 
   /**
-   * Gives 
+   * Enables the server to respond on the port that is set up.
+   * It includes function that error handling.
    * 
    * @class App
    * @method listen
+   * @private
    */
   private listen(): void {
     this.server.listen(this.port, () => {
@@ -129,9 +133,9 @@ class App {
    * 
    * @class App
    * @method routes
-   * @return void
+   * @private
    */
-  private routes(): void {
+  private routes() {
     const router: express.Router = express.Router()
 
     IndexRoute.create(router)
