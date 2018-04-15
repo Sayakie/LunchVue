@@ -127,8 +127,9 @@ class LunchVue {
    * @class LunchVue
    * @method drawTable
    */
-  drawTable() {
-    console.log(this.meals[new Date().getDate() - 1])
+  drawTable(date = this.now.getDate() - 1) {
+    const now = this.now.getHours() <= 8 ? 'breakfast' : this.now.getHours() >= 9 && this.now.getHours() <= 14 ? 'lunch' : 'dinner'
+    $('#result').html(!!this.meals[date][now]['food'] ? this.meals[date][now]['food'] : "식단이 없어요.")
   }
 
   /**
