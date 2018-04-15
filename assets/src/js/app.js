@@ -7,5 +7,5 @@ $(() => {
 })
 
 $( document ).on('page-loaded lunchvue-loaded', () => {
-  $('#preloader').fadeOut(600)
+  $('#preloader').fadeOut(1200)
 })
