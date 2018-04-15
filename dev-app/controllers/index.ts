@@ -38,7 +38,11 @@ export class IndexRoute extends BaseRoute {
       new IndexRoute().find(req, res)
     })
 
-    router.get('/test/:school', (req: Request, res: Response) => {
+    router.post('/get', (req: Request, res: Response) => {
+      new IndexRoute().get(req, res)
+    })
+
+    router.get('/test', (req: Request, res: Response) => {
       new IndexRoute().test(req, res)
     })
   }
@@ -61,7 +65,7 @@ export class IndexRoute extends BaseRoute {
   }
 
   /**
-   * Find some meals table in goverment, then return json
+   * Find school list in goverment, then return json
    * 
    * @class IndexRoute
    * @method find
@@ -73,6 +77,24 @@ export class IndexRoute extends BaseRoute {
     const list = await LunchVue.request2(req.params.school)
 
     res.send(list)
+  }
+
+  /**
+   * Find some meals table in goverment, then return json
+   * 
+   * @class IndexRoute
+   * @method get
+   * @param req {Request} the express Request object.
+   * @param res {Response} the express Response object.
+   * @next {NextFunction} Execute the next method.
+   */
+  public async get(req: Request, res: Response) {
+    const domain = req.body.domain
+    const code = req.body.code
+    const month = !!req.body.month ? req.body.month : new Date().getMonth() + 1
+    const data = await LunchVue.get(domain, code, month)
+
+    res.json(data)
   }
 
   /**

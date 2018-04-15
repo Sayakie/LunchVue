@@ -1,7 +1,41 @@
 import * as request from 'request'
+import * as cheerio from 'cheerio'
 
 /**
- * LunchVue Server Library v0.1.4 (https://github.com/Kurosnape/LunchVue/)
+ * It indicates that you have used some of the following library:
+ * neis-meal 1.0.0 (https://github.com/OnLiU211/neis-meal)
+ * 
+ * Thank you very much for your help ⸻ @Danuel (https://twitter.com/_danuel_)
+ */
+
+export type NOT_EXISTS = ''
+export type MenuTable = (NOT_EXISTS | DailyMenu)[]
+
+export type Menu = NOT_EXISTS | {
+  food: Food
+  nutrition: Nutrition
+}
+
+export type DailyMenu = {
+  breakfast: Menu
+  lunch: Menu
+  dinner: Menu
+}
+
+export type Food = string[]
+export type Nutrition = string[] | null
+
+export type HTML = string
+
+export const NOT_EXISTS = ''
+export const enum MENU {
+  BREAKFAST = '조식',
+  LUNCH = '중식',
+  DINNER = '석식'
+}
+
+/**
+ * LunchVue Server Library v0.1.4 (https://github.com/Kurosnape/LunchVue)
  * Copyright 2018 LunchVue Authors
  * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
  */
@@ -115,7 +149,7 @@ class LunchVue {
               zipAdres: address
             } = spread
 
-            return { name, code, type, address }
+            return { name, code, type, address, domain }
           })
 
           resolve(spreadList)
@@ -134,8 +168,119 @@ class LunchVue {
    * @class LunchVue
    * @method get
    */
-  public get() {
+  async get(domain: string, code: string, month: number) {
+    const result = await new Promise((resolve, reject): void => {
+      const payload = {
+        uri: `http://${ domain }/sts_sci_md00_001.do?schulCode=${ code }&schulCrseScCode=4&ay=${ new Date().getFullYear() }&mm=${ ('0' + month).substr(-2) }`,
+        rejectUnauthorized: false,
+        gzip: true,
+        headers: {
+          'User-Agent': 'lunchvue-request-bot'
+        }
+      }
 
+      const validator = (error, res, body): MenuTable => {
+        if (error) {
+          reject(error)
+          return
+        }
+
+        if (res.statusCode !== 200) {
+          const message = 'invalid request'
+          const reason = new Error(message)
+          reject(reason)
+          return
+        }
+
+        const data = LunchVue.getMeals(body)
+        resolve(data)
+      }
+
+      request(payload, validator)
+    })
+
+    return result
+  }
+
+  /**
+   * @class LunchVue
+   * @method getMeals
+   * @author danuel
+   */
+  protected static getMeals(body: HTML): MenuTable {
+    const pureElement = LunchVue.normalizationHTML(body)
+
+    return pureElement.map((value: string, index: number) => {
+      const menuTable = value === NOT_EXISTS
+        ? NOT_EXISTS
+        : LunchVue.getDayMenu(value)
+
+      return menuTable
+    })
+    .filter((value: any) => !!value)
+  }
+
+  /**
+   * @class LunchVue
+   * @method normalizationHTML
+   * @author danuel
+   */
+  protected static normalizationHTML(body: string) {
+    const $ = cheerio.load(body, {
+      xmlMode: true
+    })
+
+    const separateElement = 'tbody tr td'
+    const divisionalExpression = /\s+/
+    return $(separateElement).map(function(index, element) {
+      return $(this).text().replace(divisionalExpression, NOT_EXISTS)
+    }).get()
+    .filter((value) => value !== ' ')
+  }
+
+  /**
+   * @class LunchVue
+   * @method getDayMenu
+   * @author danuel
+   */
+  protected static getDayMenu(value: string): DailyMenu {
+    return {
+      breakfast: LunchVue.extractMenu(MENU.BREAKFAST, value),
+      lunch: LunchVue.extractMenu(MENU.LUNCH, value),
+      dinner: LunchVue.extractMenu(MENU.DINNER, value)
+    }
+  }
+
+  /**
+   * @class LunchVue
+   * @method extractMenu
+   * @author danuel
+   */
+  protected static extractMenu(menu: MENU, value: string): Menu {
+    const pattern = new RegExp(`(\\[${ menu }\\])(.+?)(?=\\[)`)
+
+    // hack for pattern-matching
+    const __value = value + '['
+    const __menu = __value.match(pattern)
+
+    return (__menu)
+      ? LunchVue.separateMenu(__menu[2])
+      : NOT_EXISTS
+  }
+
+  /**
+   * @class LunchVue
+   * @method separateMenu
+   * @author danuel
+   */
+  protected static separateMenu(menu: string): Menu {
+    return {
+      food: menu
+        .split(/\d{1,2}\./g)
+        .filter((value) => !!value),
+      nutrition: menu
+        .match(/(\d{1,2}\.)+/g)
+    }
   }
 }
 

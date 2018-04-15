@@ -59,12 +59,12 @@ class LunchVue {
     if (this.haveStorage) {
       this.schoolId = localStorage.schoolId
       this.schoolName = localStorage.schoolName
-      //this.meals = JSON.parse(localStorage.meals)
+      this.meals = JSON.parse(localStorage.meals)
 
       this.$device.css('display', 'flex')
       this.$school.html(this.schoolName)
       this.$date.html(`${this.now.getFullYear()}. ${this.now.getMonth() + 1}. ${this.now.getDate()}`)
-      //this.drawTable(this.meals)
+      this.drawTable()
       $(document).trigger('preload-end')
     } else {
       this.appendSearchModal()
@@ -110,7 +110,7 @@ class LunchVue {
     data.map(fragment => {
       fragment.map(pieces => {
         schoolList.push(
-          `<li data-school=${JSON.stringify({code: pieces.code, name: pieces.name})}>
+          `<li data-school=${JSON.stringify({code: pieces.code, name: pieces.name, domain: pieces.domain})}>
             <h1>${pieces.name}</h1>
             <p>${pieces.address}</p>
           </li>`
@@ -119,6 +119,16 @@ class LunchVue {
     })
 
     this.$searchResult.html(schoolList)
+  }
+
+  /**
+   * Draw school meals table.
+   * 
+   * @class LunchVue
+   * @method drawTable
+   */
+  drawTable() {
+    console.log(this.meals[new Date().getDate() - 1])
   }
 
   /**
@@ -132,9 +142,10 @@ class LunchVue {
     localStorage.isHave = true
     localStorage.schoolId = query.code
     localStorage.schoolName = query.name
+    localStorage.schoolDomain = query.domain
     this.haveStorage = true
     this.$searchSchool.modal('hide')
-    //this.getMeals()
+    this.getMeals()
     this.loadAddition()
   }
 
@@ -146,9 +157,14 @@ class LunchVue {
    */
   getMeals() {
     $.ajax({
-      type: 'GET',
-      url: `/get/${localStorage.schoolId}`,
+      type: 'POST',
+      url: `/get`,
       dataType: 'JSON',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        domain: localStorage.schoolDomain,
+        code: localStorage.schoolId
+      }),
       success: (data) => {
         localStorage.meals = JSON.stringify(data)
       },
@@ -165,7 +181,11 @@ class LunchVue {
    * @method displayAlert
    */
   displayAlert(type, message) {
-
+    if (type === 'error') {
+      console.error(message)
+    } else {
+      console.log(message)
+    }
   }
 
   /**
@@ -182,7 +202,7 @@ class LunchVue {
 
       $.ajax({
         type: 'GET',
-        url: `/test/${school}`,
+        url: `/find/${school}`,
         dataType: 'JSON',
         success: (data) => {
           this.drawSchoolList(data)
