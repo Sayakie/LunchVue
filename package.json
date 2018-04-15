@@ -7,8 +7,9 @@
   "author": "Kurosnape <shuvi.dev.b701@gmail.com> (https://kurosnape.github.io)",
   "scripts": {
     "start": "node ./app/index.js",
-    "dev": "nodemon -e ts -w ./dev-app -x yarn run dev:watch",
-    "dev:watch": "ts-node dev-app/index.ts",
+    "build": "tsc -p tsconfig.json && yarn run sass && yarn run webpack",
+    "dev": "ts-node dev-app/index.ts",
+    "dev:watch": "nodemon -e ts -w ./dev-app -x yarn run dev",
     "sass": "node-sass --output-style compressed assets/src/sass/app.sass -o assets/dist",
     "sass:watch": "nodemon -e sass -w ./assets/src/sass -x yarn run sass",
     "js": "yarn run js:compile && yarn run js:copy",

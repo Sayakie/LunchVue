@@ -65,6 +65,7 @@ class LunchVue {
       this.$school.html(this.schoolName)
       this.$date.html(`${this.now.getFullYear()}. ${this.now.getMonth() + 1}. ${this.now.getDate()}`)
       //this.drawTable(this.meals)
+      $(document).trigger('preload-end')
     } else {
       this.appendSearchModal()
     }
@@ -131,8 +132,9 @@ class LunchVue {
     localStorage.isHave = true
     localStorage.schoolId = query.code
     localStorage.schoolName = query.name
+    this.haveStorage = true
     this.$searchSchool.modal('hide')
-    this.getMeals()
+    //this.getMeals()
     this.loadAddition()
   }
 
@@ -157,6 +159,16 @@ class LunchVue {
   }
 
   /**
+   * 
+   * 
+   * @class LunchVue
+   * @method displayAlert
+   */
+  displayAlert(type, message) {
+
+  }
+
+  /**
    * Bind the events.
    * 
    * @class LunchVue
@@ -166,7 +178,7 @@ class LunchVue {
     const self = this
     this.$searchSchool.bind('submit', (e) => {
       const school = this.$searchSchoolFocusing.val()
-      this.$searchResult.html('<p>불러오는 중입니다. 잠시만 기다려주세요!</p>')
+      this.$searchResult.html('<p>불러오는 중입니다. 잠시만 기다려주세요!</p>').show()
 
       $.ajax({
         type: 'GET',
@@ -192,6 +204,7 @@ class LunchVue {
     $(document).on('click', '#searchResult li', function() {
       const data = $(this).data('school')
       self.setSchool(data)
+      $(document).trigger('preload-begin')
     })
   }
 }

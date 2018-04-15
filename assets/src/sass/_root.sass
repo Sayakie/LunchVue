@@ -5,13 +5,15 @@
 body 
   background: $default-background
   color: $default-color
+  height: 100vh
+  padding: 14vh 0 7vh
 
 header, footer
   display: flex
   position: fixed
   align-items: center
-  background: $header-background-default
-  @include background(linear-gradient(to top, $header-background-default, $header-background-highlight))
+  background: $main-background-default
+  @include background(linear-gradient(-45deg, $main-background-default, $main-background-highlight))
 
 header
   top: 0
@@ -25,10 +27,13 @@ header
   h1
     font-size: 1.75rem
     text-align: center
-    padding: 20px
+    padding: 2vh
 
 #searchSchool
   color: #000
+  .modal-title
+    i
+      margin-right: 7px
   .modal-footer
     min-height: 7vh
     justify-content: center
@@ -56,18 +61,25 @@ header
 footer
   bottom: 0
   width: 100vw
-  height: 6.5vh
+  min-height: 6.5vh
+  padding: 2vh 0
+  font-weight: bold
   z-index: 1000
 
 footer
   display: none
 
+.footer-title,
+.footer-meta
+  padding: 0
+  padding-left: 7px
+
 .footer-title
   .title
+    padding-right: 4vw  // For easier access
     cursor: pointer
-  i
-    margin-right: 5px
 
 .footer-meta
   span
-    margin: 0 4px
+    margin: 0 .5rem
+    cursor: pointer

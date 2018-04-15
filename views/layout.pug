@@ -68,7 +68,7 @@ html(lang='ko')
     link(rel="stylesheet", href="assets/app.css")
     script(src="assets/jquery.min.js")
     script(src="assets/bootstrap.min.js")
-    script(src="http://localhost:8080/bundle.js")
+    script(src="assets/bundle.js")
   body
     main
       section#preloader
@@ -80,6 +80,7 @@ html(lang='ko')
           i
           i
           i
+      section#alert-zone
       section#main
         header
           .container-fluid
@@ -89,10 +90,10 @@ html(lang='ko')
                   h1 전국 학교 식단표
         block content
         footer
-          .container-fluid
+          .container
             .row
-              .footer-title.col-8
-                i.fa.fa-fw.fa-suitcase
+              .footer-title.col
+                i.fa.fa-fw.fa-suitcase.mr-2
                 span.title [##__TITLE__##]
               .footer-meta.text-right.col
                 span.date [##__DATE__##]

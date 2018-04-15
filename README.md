@@ -21,12 +21,10 @@ LunchVue(이하 '런치뷰')는 언제 어디서든 인터넷이 된다면 학�
  3. 소스를 컴파일합니다.
 
  ```bash
- npm run sass
- npm run js
+ npm run build
  # OR
 
- yarn run sass
- yarn run js
+ yarn run build
  ```
 
  4. 서버를 시작합니다:
