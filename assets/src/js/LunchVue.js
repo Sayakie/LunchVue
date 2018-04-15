@@ -147,7 +147,6 @@ class LunchVue {
     this.haveStorage = true
     this.$searchSchool.modal('hide')
     this.getMeals()
-    this.loadAddition()
   }
 
   /**
@@ -168,6 +167,9 @@ class LunchVue {
       }),
       success: (data) => {
         localStorage.meals = JSON.stringify(data)
+      },
+      complete: () => {
+        this.loadAddition()
       },
       error: () => {
         this.displayAlert('error', '서버와 연결을 실패했습니다. 식단을 가져올 수 없습니다.')

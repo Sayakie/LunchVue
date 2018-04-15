@@ -41,3 +41,9 @@ LunchVue(이하 '런치뷰')는 언제 어디서든 인터넷이 된다면 학�
 NODE_ENV 부분을 `production`으로 변경해주세요. 이 작업은 캐시 설정과 더불어 성능 향상을 위해 사용됩니다.
 
 이제 즐기세요!
+
+#### 개발 방법
+
+`yarn run dev:watch`를 통해 서버를 자동으로 watch합니다.
+`yarn run sass:watch`를 통해 스타일시트 파일들을 자동으로 watch합니다.
+`yarn run webpack:watch`를 통해 스크립트 파일을 자동으로 watch합니다.
