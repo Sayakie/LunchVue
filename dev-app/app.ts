@@ -81,7 +81,8 @@ class App {
     this.express.use(bodyParser.json())
     this.express.use(bodyParser.urlencoded({ extended: false }))
     this.express.use('/assets', express.static(path.join(__dirname, '../assets/dist'), { maxAge: EXPIRE }))
-    this.express.use('/assets', express.static(path.join(__dirname, '../assets/src/js/origin'), { maxAge: EXPIRE }))
+    this.express.use('/assets', express.static(path.join(__dirname, '../node_modules/bootstrap/dist/js'), { maxAge: EXPIRE }))
+    this.express.use('/assets', express.static(path.join(__dirname, '../node_modules/jquery/dist'), { maxAge: EXPIRE }))
     this.express.use('/', express.static(path.join(__dirname, '../assets/public'), { maxAge: EXPIRE }))
 
     // Catch 404 and forward to error handler

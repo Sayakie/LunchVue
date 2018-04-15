@@ -10,14 +10,14 @@ header, footer
   display: flex
   position: fixed
   align-items: center
+  background: $header-background-default
+  @include background(linear-gradient(to top, $header-background-default, $header-background-highlight))
 
 header
   top: 0
   width: 100vw
   min-height: 5vh
-  background: $header-background-default
-  @include background(linear-gradient(to top, $header-background-default, $header-background-highlight))
-  z-index: 9500
+  z-index: 1000
 
 .header-title
   padding: 0
@@ -26,12 +26,36 @@ header
     text-align: center
     padding: 20px
 
+#searchSchool
+  color: #000
+  .modal-footer
+    min-height: 7vh
+    justify-content: center
+
+#searchResult
+  width: 100vw
+  text-align: center
+  li
+    display: flex
+    height: 10vh
+    flex-flow: column
+    justify-content: center
+    align-items: center
+    margin: 1vh 0
+    cursor: pointer
+    &:hover
+      background: $list-hover-background
+      color: $list-hover-color
+    h1
+      font-size: 1.1rem
+      font-weight: bold
+    p
+      margin: 0
+
 footer
   bottom: 0
   width: 100vw
   height: 6.5vh
-  background: #fff
-  color: #000
   z-index: 1000
 
 footer

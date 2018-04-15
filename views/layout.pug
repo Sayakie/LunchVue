@@ -1,4 +1,4 @@
-- var TITLE = `LunchVue ─ 전국 급식 식단표`
+- var TITLE = `LunchVue ─ 전국 학교 식단표`
 - var DESCIRIPTION = `우리 학교 급식 식단표를 빠르고 쉽게 확인하세요.`
 block variables
 
@@ -65,8 +65,9 @@ html(lang='ko')
     //- Stylesheets & Scripts
     link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css")
     link(rel="stylesheet", href="assets/app.css")
-    script(src="assets/jquery-3.3.1.js")
-    script(data-main="assets/app" src="assets/require.js")
+    script(src="assets/jquery.min.js")
+    script(src="assets/bootstrap.min.js")
+    script(src="http://localhost:8080/bundle.js")
   body
     main
       section#preloader
@@ -84,7 +85,7 @@ html(lang='ko')
             .row
               .header.col-12
                 .header-title.col-12
-                  h1 전국 급식 식단표
+                  h1 전국 학교 식단표
         block content
         footer
           .container-fluid
