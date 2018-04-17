@@ -34,6 +34,7 @@ header
     li
       padding: 1rem
       cursor: pointer
+      &.active,
       &:hover
         background: rgba(0, 0, 0, 0.25)
 
@@ -44,7 +45,7 @@ header
     text-align: center
     padding: 2vh
 
-#searchSchool
+#searchForm
   color: #000
   .modal-title
     i
@@ -86,8 +87,8 @@ footer
 
 .footer-title,
 .footer-meta
-  padding: 0
-  padding-left: 7px
+  @include media-breakpoint-down(sm)
+    text-align: center
 
 .footer-title
   .title
@@ -99,6 +100,7 @@ footer
     margin: 0 .5rem
     cursor: pointer
 
-#result
+#mealResult
   font-family: $font-poor
   font-size: 1.75rem
+  text-align: center

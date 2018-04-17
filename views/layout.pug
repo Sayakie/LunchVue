@@ -88,20 +88,19 @@ html(lang='ko')
               .header.col
                 .header-title.col
                   h1 전국 학교 식단표
-              .w-100
               .nav.col
                 ul
-                  li.col 조식
-                  li.col 중식
-                  li.col 석식
+                  li.col(data-type='breakfast') 조식
+                  li.col(data-type='lunch') 중식
+                  li.col(data-type='dinner') 석식
         block content
-        footer
+        footer#device
           .container
             .row
-              .footer-title.col
+              .footer-title.col-12.col-md-8
                 i.fa.fa-fw.fa-suitcase.mr-2
                 span.title [##__TITLE__##]
-              .footer-meta.text-right.col
+              .footer-meta.text-right.col-12.col-md-4
                 span.date [##__DATE__##]
                 span.prev
                   i.fa.fa-fw.fa-chevron-left

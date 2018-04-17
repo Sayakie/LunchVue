@@ -38,8 +38,8 @@ export class IndexRoute extends BaseRoute {
       new IndexRoute().find(req, res)
     })
 
-    router.post('/get', (req: Request, res: Response) => {
-      new IndexRoute().get(req, res)
+    router.post('/fetch', (req: Request, res: Response) => {
+      new IndexRoute().fetch(req, res)
     })
 
     router.get('/test', (req: Request, res: Response) => {
@@ -88,7 +88,7 @@ export class IndexRoute extends BaseRoute {
    * @param res {Response} the express Response object.
    * @next {NextFunction} Execute the next method.
    */
-  public async get(req: Request, res: Response) {
+  public async fetch(req: Request, res: Response) {
     const domain = req.body.domain
     const code = req.body.code
     const month = !!req.body.month ? req.body.month : new Date().getMonth() + 1
