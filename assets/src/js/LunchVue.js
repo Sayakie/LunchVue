@@ -6,7 +6,7 @@
 class LunchVue {
   constructor() {
     this.initVariables()
-    this.loadMeals()
+    //this.loadMeals()
     this.bindEvents()
   }
 
@@ -19,13 +19,13 @@ class LunchVue {
    */
   initVariables() {
     this.now = new Date()
-    this.schoolId = localStorage[`schooId`]
+    this.schoolId = localStorage[`schoolId`]
     this.schoolName = localStorage[`schoolName`]
     this.schoolDomain = localStorage[`schoolDomain`]
     this.meals = {}
-    this.meals.prev = localStorage[`schoolMeals_${this.schoolId}_${this.now.getMonth()}`]
-    this.meals.current = localStorage[`schoolMeals_${this.schoolId}_${this.now.getMonth() + 1}`]
-    this.meals.next = localStorage[`schoolMeals_${this.schoolId}_${this.now.getMonth() + 2}`]
+    this.meals.prev = localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.now.getMonth())}`]
+    this.meals.current = localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.now.getMonth() + 1)}`]
+    this.meals.next = localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.now.getMonth() + 2)}`]
     this.haveSchoolId = false
     this.haveSchoolMeals = false
     this.checkStorage()
@@ -40,10 +40,14 @@ class LunchVue {
     this.$searchResult = $('#searchResult')
     this.$mealResult = $('#mealResult')
     this.$device = $('#device')
+    this.$result = $('#result')
     if (this.haveSchoolMeals) {
       this.$device.css('display', 'flex')
       this.$schoolName.html(this.schoolName)
       this.$schoolDate.html(this.calcDate(this.now))
+      this.printMeals()
+    } else {
+      this.appendSearchModal()
     }
   }
 
@@ -71,6 +75,7 @@ class LunchVue {
    * 
    * @class LunchVue
    * @method loadMeals
+   * @deprecated
    */
   loadMeals() {
     if (this.haveSchoolMeals && this.haveSchoolId) {
@@ -97,17 +102,9 @@ class LunchVue {
     this.fetch({
       domain: this.schoolDomain,
       code: this.schoolId
-    }, {
-      expected: (data) => {
-        this.meals.current = localStorage[`schoolMeals_${this.schoolId}_${this.now.getMonth() + 1}`] = JSON.stringify(data)
-      },
-      failed: () => {
-        this.displayAlert('error', '서버와의 연결이 실패했습니다. 식단을 가져올 수 없습니다.')
-      },
-      done: () => {
-        this.getMeals()
-        $( document ).trigger('preload-end')
-      }
+    }).done((data) => {
+      this.meals.current = localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.now.getMonth() + 1)}`] = JSON.stringify(data)
+      this.printMeals()
     })
   }
 
@@ -116,18 +113,21 @@ class LunchVue {
    * 
    * @class LunchVue
    * @method fetch
-   * @async
+   * @param {object} options - 서버에 보낼 데이터 타입
    */
-  fetch(options, callback) {
-    $.ajax({
+  fetch(options) {
+    return $.ajax({
       type: 'POST',
       url: '/get',
       dataType: 'JSON',
       contentType: 'application/json',
-      data: JSON.stringify(options.data),
-      success: callback.expected,
-      fail: callback.failed,
-      done: callback.done
+      data: JSON.stringify(options),
+      fail: () => {
+        this.displayAlert('error', '서버와의 연결이 실패했습니다. 식단을 가져올 수 없습니다.')
+      },
+      always: () => {
+        $( document ).trigger('preload-end')
+      }
     })
   }
 
@@ -208,8 +208,11 @@ class LunchVue {
    * @class LunchVue
    * @method printMeals
    */
-  printMeals() {
-    // ^.^
+  printMeals(date = this.now.getDate() - 1) {
+    const now = this.now.getHours() <= 8 ? 'breakfast' : this.now.getHours() >= 9 && this.now.getHours() <= 14 ? 'lunch' : 'dinner'
+    const meals = !!this.meals.current[date][now]['food'] ? this.meals.current[date][now]['food'] : "식단이 없어요."
+
+    this.$result.html(meals)
   }
 
   /**
@@ -235,7 +238,7 @@ class LunchVue {
    * @return {numberic?} 
    * @example zeroFill(72, 4) returns "0072"
    */
-  zeroFill(number, pad) {
+  zeroFill(number, pad = 2) {
     const proxy = '0'.repeat(pad - 1)
     return (proxy + number).substr(-pad)
   }
