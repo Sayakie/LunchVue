@@ -226,14 +226,20 @@ class LunchVue {
    * @author danuel
    */
   protected static normalizationHTML(body: string) {
-    const $ = cheerio.load(body, {
-      xmlMode: true
+    // 영양소 성분이 없는 식단도 줄 바꿈을 해주어야하기 때문에
+    // <br> 태그가 제거되기 전에 필터링합니다.
+    //
+    // 영양소 성분으로 임시적으로 'HACKED'합니다.
+    // 나중에 수정해야합니다. 또한 영양소 성분도 정상 작동하지 않을겁니다.
+    const breakToken = '1.'
+    const $ = cheerio.load(body.replace(/<br\s*[\/]?>/gi, breakToken), {
+      xmlMode: false
     })
 
     const separateElement = 'tbody tr td'
     const divisionalExpression = /\s+/
     return $(separateElement).map(function(index, element) {
-      return $(this).text().replace(divisionalExpression, NOT_EXISTS)
+      return $(this).text().replace(divisionalExpression, NOT_EXISTS)//.replace(new RegExp('__BREAK__', 'g'), '<br>')
     }).get()
     .filter((value) => value !== ' ')
   }
