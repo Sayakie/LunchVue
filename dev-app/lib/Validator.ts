@@ -1,24 +1,14 @@
-class Validator {
-  /**
-   * Bootstrap the validator.
-   * 
-   * @class Validator
-   * @method bootstrap
-   * @static
-   * @return {Validator}
-   */
-  public static bootstrap(): Validator {
-    return new Validator()
+export class Validator {
+  private static instance: Validator
+
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new Validator()
+    }
+
+    return this.instance
   }
 
-  /**
-   * Takes a {val} into a number, string or false.
-   * 
-   * @class Validator
-   * @method normalizePort
-   * @param {val} - string to test.
-   * @returns {number | string | boolean}
-   */
   public normalizePort(val: number | string): number | string | boolean {
     const port: number = (typeof val === 'string') ? parseInt(val, 10) : val
 
@@ -44,5 +34,3 @@ class Validator {
     }
   }
 }
-
-export default Validator.bootstrap()

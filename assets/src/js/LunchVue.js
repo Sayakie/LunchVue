@@ -45,7 +45,7 @@ class LunchVue {
     this.$result = $('#mealResult')
 
     this.$list = $('.nav li')
-    $(`.nav li[data-type=${this.time}]`).addClass('active')
+    $(`.nav li[data-type=${ this.time }]`).addClass('active')
     //console.log(this.$list.data('type', this.time), this.time)
     if (this.haveSchoolMeals && this.haveSchoolId) {
       this.$device.css('display', 'flex')

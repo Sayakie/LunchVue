@@ -1,2 +1,3 @@
 import app from './app'
-export { app }
+
+app.getInstance().start()
