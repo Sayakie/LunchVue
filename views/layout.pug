@@ -1,4 +1,4 @@
-- var TITLE = `LunchVue ─ 전국 급식 식단표`
+- var TITLE = `LunchVue ─ 전국 학교 식단표`
 - var DESCIRIPTION = `우리 학교 급식 식단표를 빠르고 쉽게 확인하세요.`
 block variables
 
@@ -64,9 +64,11 @@ html(lang='ko')
       | }
     //- Stylesheets & Scripts
     link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css")
+    link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Do+Hyeon|Poor+Story")
     link(rel="stylesheet", href="assets/app.css")
-    script(src="assets/jquery-3.3.1.js")
-    script(data-main="assets/app" src="assets/require.js")
+    script(src="assets/jquery.min.js")
+    script(src="assets/bootstrap.min.js")
+    script(src="assets/bundle.js")
   body
     main
       section#preloader
@@ -78,21 +80,27 @@ html(lang='ko')
           i
           i
           i
+      section#alert-zone
       section#main
         header
           .container-fluid
             .row
-              .header.col-12
-                .header-title.col-12
-                  h1 전국 급식 식단표
+              .header.col
+                .header-title.col
+                  h1 전국 학교 식단표
+              .nav.col
+                ul
+                  li.col(data-type='breakfast') 조식
+                  li.col(data-type='lunch') 중식
+                  li.col(data-type='dinner') 석식
         block content
-        footer
-          .container-fluid
+        footer#device
+          .container
             .row
-              .footer-title.col-8
-                i.fa.fa-fw.fa-suitcase
+              .footer-title.col-12.col-md-8
+                i.fa.fa-fw.fa-suitcase.mr-2
                 span.title [##__TITLE__##]
-              .footer-meta.text-right.col
+              .footer-meta.text-right.col-12.col-md-4
                 span.date [##__DATE__##]
                 span.prev
                   i.fa.fa-fw.fa-chevron-left

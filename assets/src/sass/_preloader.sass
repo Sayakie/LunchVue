@@ -1,13 +1,10 @@
 #preloader
   position: fixed
+  top: 0
   width: 100vw
   height: 100vh
-  background-color: #101418
-  transition: opacity 0.4s
-  z-index: 5000
-
-  &.loaded
-    opacity: 0
+  background: $default-background
+  z-index: 999
 
   .spinner
     @include animation(rotate 10s infinite linear)

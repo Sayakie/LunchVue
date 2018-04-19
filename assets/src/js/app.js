@@ -1,9 +1,18 @@
-import { default as LunchVue } from 'LunchVue'
+import 'babel-polyfill'
+import LunchVue from './LunchVue'
 
 $(() => {
-  $.event.trigger('page-loaded')
+  $(document).trigger('page-loaded')
+  new LunchVue()
 })
 
-$( document ).on('page-loaded lunchvue-loaded', () => {
-  $('#preloader').fadeOut(600)
-})
+$( document )
+  .on('preload-begin', () => {
+    $('#preloader').show()
+  })
+  .on('page-loaded', () => {
+    $('#preloader').fadeOut(1200)
+  })
+  .on('preload-end', () => {
+    $('#preloader').delay(400).fadeOut(1000)
+  })

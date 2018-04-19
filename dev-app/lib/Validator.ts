@@ -22,7 +22,10 @@ export class Validator {
   }
   
   /**
-   * Takes another function and wraps it in a promise
+   * Takes another function and wraps it in a promise.
+   * 
+   * @class Validator
+   * @method asyncMiddleware
    */
   public* asyncMiddleware(fn): any {
     (req, res, next) => {

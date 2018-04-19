@@ -1,9 +1,28 @@
 extends ./layout.pug
 block variables
   //- To override these variables, we use `var` keyword unwillingly
-  - var TITLE = `LunchVue ─ 전국 급식 식단표`
+  - var TITLE = `LunchVue ─ 전국 학교 식단표`
   - var DESCRIPTION = `우리 학교 급식 식단표를 빠르고 쉽게 확인하세요.`
   - var URL = BASE_URL
 
 block content
-  p hi
+  #searchForm.modal(tabindex='-1', role='dialog', aria-labelledby='학교를 검색하세요.').fade
+    .modal-dialog(role='document').modal-lg
+      .modal-content
+        .modal-header
+          h5.modal-title
+            i.fa.fa-fw.fa-search
+            span 학교를 검색하세요.
+          button.close(type='button', data-dismiss='modal', aria-label='닫기')
+            span(aria-hidden='true') &times;
+        .modal-body
+          form
+            label(for='searchSchoolInput') 학교명
+            .input-group
+              input#searchSchoolInput.form-control(type='text', autocomplete='off', placeholder='학교명')
+              .input-group-append
+                button.btn.btn-outline-primary(type='submit') 검색
+            small#schoolNameHelper.form-text.text-muted 전국의 모든 유치원, 초중고교를 검색하므로 정확하게 입력하면 원하시는 학교를 더 쉽게 찾을 수 있습니다.
+        .modal-footer
+          #searchResult
+  #mealResult

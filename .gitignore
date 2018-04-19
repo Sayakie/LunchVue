@@ -1,6 +1,7 @@
 node_modules
 app/
 assets/dist/
+dev-app/lib/neis.ts
 
 .env
 yarn-error.log
