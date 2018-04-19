@@ -1,25 +1,19 @@
-class Validator {
-  /**
-   * Bootstrap the validator.
-   * 
-   * @class Validator
-   * @method bootstrap
-   * @static
-   * @return {Validator}
-   */
-  public static bootstrap(): Validator {
-    return new Validator()
+type unNormalizedPort = number | string
+
+type normalizedPort = number | string | boolean
+
+export class Validator {
+  private static instance: Validator
+
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new Validator()
+    }
+
+    return this.instance
   }
 
-  /**
-   * Takes a {val} into a number, string or false.
-   * 
-   * @class Validator
-   * @method normalizePort
-   * @param {val} - string to test.
-   * @returns {number | string | boolean}
-   */
-  public normalizePort(val: number | string): number | string | boolean {
+  public normalizePort(val: unNormalizedPort): normalizedPort {
     const port: number = (typeof val === 'string') ? parseInt(val, 10) : val
 
     if (isNaN(port)) {
@@ -30,19 +24,4 @@ class Validator {
       return false
     }
   }
-  
-  /**
-   * Takes another function and wraps it in a promise.
-   * 
-   * @class Validator
-   * @method asyncMiddleware
-   */
-  public* asyncMiddleware(fn): any {
-    (req, res, next) => {
-      Promise.resolve(fn(req, res, next))
-        .catch(next)
-    }
-  }
 }
-
-export default Validator.bootstrap()

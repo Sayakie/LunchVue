@@ -1,5 +1,5 @@
 /**
- * LunchVue Client Library v0.1.15 (https://github.com/Kurosnape/LunchVue/)
+ * LunchVue Client Library v0.1.16 (https://github.com/Kurosnape/LunchVue)
  * Copyright 2018 LunchVue Authors
  * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
  */
@@ -12,9 +12,6 @@ class LunchVue {
   /**
    * 런치뷰에서 사용할 모든 변수를 초기화합니다.
    * DOM을 다룰 변수는 앞에 $를 붙입니다.
-   * 
-   * @class LunchVue
-   * @method initVariables
    */
   initVariables() {
     this.date = new Date()
@@ -22,7 +19,12 @@ class LunchVue {
     this.temp = {}
     this.temp.date = this.date
     this.meals = {}
-    this.meals.prev = null
+    /**
+     * this.meals.prev = null
+     * 
+     * @description 과거 식단은 쓸모가 없다고 판단, 다음 버전에서 제거됩니다.
+     * @deprecated
+     */
     this.meals.current = null
     this.meals.next = null
     this.schoolId = null
@@ -45,8 +47,8 @@ class LunchVue {
     this.$result = $('#mealResult')
 
     this.$list = $('.nav li')
-    $(`.nav li[data-type=${this.time}]`).addClass('active')
-    //console.log(this.$list.data('type', this.time), this.time)
+    $(`.nav li[data-type=${ this.time }]`).addClass('active')  // better UX
+
     if (this.haveSchoolMeals && this.haveSchoolId) {
       this.$device.css('display', 'flex')
       this.$schoolName.html(this.schoolName)
@@ -58,17 +60,15 @@ class LunchVue {
         name: this.schoolName,
         domain: this.schoolDomain
       }
-      this.setSchool(query)
+
+      this.setSchoolAndFetchMeals(query)
     } else {
       this.appendSearchModal()
     }
   }
 
   /**
-   * 클라이언트 로컬 저장소에 값이 있는지 확인합니다.
-   * 
-   * @class LunchVue
-   * @method checkStorage
+   * 클라이언트 로컬 저장소에 학교 코드, 이름, 도메인 그리고 이번 달 식단이 있는지 확인합니다.
    */
   checkStorage() {
     if (!!localStorage[`schoolId`]) {
@@ -85,33 +85,11 @@ class LunchVue {
   }
 
   /**
-   * 급식 식단표를 불러옵니다.
-   * 학교 아이디와 식단표가 저장되어 있다면 로컬에서 식단표를 불러오지만
-   * 학교 아이디만 있고 식단표가 저장되어 있지 않다면 식단표를 서버에 요청합니다.
-   * 만약 둘 다 없을 경우 학교 검색창을 띄우도록 합니다.
+   * 학교를 설정하고 서버에서 식단을 가져옵니다.
    * 
-   * @class LunchVue
-   * @method loadMeals
-   * @deprecated
-   */
-  loadMeals() {
-    if (this.haveSchoolMeals && this.haveSchoolId) {
-      // this.getMeals()
-    } else if (this.haveSchoolId) {
-      // this.fetch()
-    } else {
-      this.appendSearchModal()
-    }
-  }
-
-  /**
-   * 학교를 설정합니다.
-   * 
-   * @class LunchVue
-   * @method setSchool
    * @param {object} query - 학교 코드와 이름, 도메인을 포함한 JSON 오브젝트
    */
-  setSchool(query) {
+  setSchoolAndFetchMeals(query) {
     this.schoolId = localStorage[`schoolId`] = query.code
     this.schoolName = localStorage[`schoolName`] = query.name
     this.schoolDomain = localStorage[`schoolDomain`] = query.domain
@@ -129,9 +107,7 @@ class LunchVue {
   /**
    * 서버에서 급식 식단표를 가져옵니다.
    * 
-   * @class LunchVue
-   * @method fetch
-   * @param {object} options - 서버에 보낼 데이터 타입
+   * @param {object} options - 가져올 식단의 도메인과 학교 코드
    */
   fetch(options) {
     return $.ajax({
@@ -150,27 +126,19 @@ class LunchVue {
   }
 
   /**
-   * 로컬 저장소에서 급식 식단표를 가져옵니다.
-   * 
-   * @class LunchVue
-   * @method getMeals
-   */
-  getMeals() {
-    // TODO
-  }
-
-  /**
-   * 학교 검색창을 띄웁니다.
-   * 입력창과 결과창의 내용을 지우고, 검색할 학교를 바로 입력할 수 있도록
-   * 입력창에 포커싱을 합니다.
-   * 
-   * @class LunchVue
-   * @method appendSearchModal
+   * 학교 검색창을 띄웁니다. 입력창과 결과창의 내용을 지우고,
+   * 검색할 학교를 바로 입력할 수 있도록 입력창에 포커싱을 합니다.
    */
   appendSearchModal() {
     this.$searchForm.modal('show')
-    this.$searchSchoolInput.val('').focus()
+    this.$searchSchoolInput.val('')
     this.$searchResult.html('')
+
+    // FIXED. 검색창이 페이드-인 애니메이션 도중에는 포커싱이 되지 않으므로
+    // 시간을 두고 포커싱을 합니다.
+    setTimeout(() => {
+      this.$searchSchoolInput.focus()
+    }, 800)
   }
 
   /**
@@ -269,9 +237,7 @@ class LunchVue {
    * @param {string} message - 표시할 메시지
    */
   displayAlert(type, message) {
-    //
-    if (this.debug)
-      console.log(message)
+    console.log(message)
   }
 
   /**
@@ -329,7 +295,7 @@ class LunchVue {
     // 수정하지 마세요 ─ * DO NOT TOUCH IT *
     $( document ).on('click', '#searchResult li', function() {
       $( document ).trigger('preload-begin')
-      _this.setSchool($(this).data('school'))
+      _this.setSchoolAndFetchMeals($(this).data('school'))
     })
   }
 }
