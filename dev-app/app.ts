@@ -6,74 +6,44 @@ import * as compression from 'compression'
 import * as logger from 'morgan'
 import * as bodyParser from 'body-parser'
 import * as dotenv from 'dotenv'
+
+import { Validator } from './lib/Validator'
+import { Route } from './route'
+
 dotenv.config({ path: '.env' })
 
-import { default as Validator } from './lib/Validator'
-import { IndexRoute } from './controllers/index';
-
 interface IError {
-  status?: number,
-  data?: any
+  status?: number
 }
 
 class App {
-  public static readonly PORT: number | string | boolean = Validator.normalizePort(process.env.PORT || 3000)
-  private server: Server
-  private express: express.Application
+  private static instance: App
+
+  public static getInstance(): App {
+    if (!this.instance) {
+      this.instance = new App()
+    }
+
+    return this.instance
+  }
+
+  private readonly express = express()
+  private readonly server = createServer(this.express)
+  private readonly port = Validator.getInstance().normalizePort(process.env.PORT || 3000)
   // private socket: SockerIO.Server
-  private port: number | string | boolean
 
-  /**
-   * Set up the application. Assign variables to allow access to each framework,
-   * including Express.js and Socker.io Servers, and allow them to respond to the port.
-   * Also set the error handler to make debugging easier.
-   * 
-   * @class App
-   * @constructor
-   */
-  constructor() {
-    this.initialization()
-    this.configuration()
+  public start(): void {
     this.listen()
-    this.routes()
   }
 
-  /**
-   * Bootstrap the application.
-   * 
-   * @class App
-   * @method bootstrap
-   * @static
-   * @return {App} Returns the newly created injector for this server.
-   */
-  public static bootstrap(): App {
-    return new App()
+  private constructor() {
+    this.configuration()
+    this.createRoutes()
   }
 
-  /**
-   * Initial the application.
-   * 
-   * @class App
-   * @method initialization
-   * @private
-   */
-  private initialization() {
-    this.express = express()
-    this.server = createServer(this.express)
-    // this.socket = socketIO(this.server)
-  }
-
-  /**
-   * Config the applicaiton.
-   * 
-   * @class App
-   * @method configuration
-   * @private
-   */
   private configuration(): void {
-    // cache for 24 hours
-    const EXPIRE = (process.env.NODE_ENV !== 'development') ? 86400 * 1000 : 0
-    this.port = App.PORT
+    const HOUR = 1000 * 60 * 60
+    const EXPIRE = (process.env.NODE_ENV === 'development') ? 0 : 24 * HOUR
 
     this.express.disable('x-powered-by')
     this.express.set('views', path.join(__dirname, '../views'))
@@ -88,60 +58,45 @@ class App {
     this.express.use('/', express.static(path.join(__dirname, '../assets/public'), { maxAge: EXPIRE }))
 
     // Catch 404 and forward to error handler
-    this.express.use((err: IError, req: express.Request, res: express.Response, next: express.NextFunction) => {
-      err.status = 404
-      next(err)
+    this.express.use((error: IError, _req: express.Request, _res: express.Response, next: express.NextFunction) => {
+      error.status = 404
+      next(error)
     })
   }
 
-  /**
-   * Enables the server to respond on the port that is set up.
-   * It includes function that error handling.
-   * 
-   * @class App
-   * @method listen
-   * @private
-   */
+  private createRoutes(): void {
+    const router: express.Router = express.Router()
+
+    Route.getInstance().attach(router)
+    this.express.use(router)
+  }
+
   private listen(): void {
-    this.server.listen(this.port, () => {
-      console.log(`[Server] Successfully Listening on ${this.port}`)
-    })
-    this.server.on('error', (e: NodeJS.ErrnoException) => {
-      if (e.syscall !== 'listen') {
-        throw e
+    this.server.listen(this.port, () => console.log(`[Server] Successfully Listening on ${ this.port }`))
+    this.server.on('error', (error: NodeJS.ErrnoException) => {
+      if (error.syscall !== 'listen') {
+        throw error
       }
 
       // Handle specific listen errors with friendly messages
-      const bind = (typeof this.port === 'string') ? `Pipe ${this.port}` : `Port ${this.port}`
-      switch (e.code) {
+      const portPrefixed = (typeof this.port === 'string')
+        ? `Pipe ${ this.port }`
+        : `Port ${ this.port }`
+
+      switch (error.code) {
         case 'EACCES':
-          console.error(`[Server] Permission denied. Requires elevated privileges`)
+          console.error('[Server] Permission denied. Requires elevated privileges')
           process.exit(1)
           break
         case 'EADDRINUSE':
-          console.error(`[Server] ${bind} is already in use`)
+          console.error(`[Server] ${ portPrefixed } is already in use`)
           process.exit(1)
           break
         default:
-          throw e
+          throw error
       }
     })
   }
-
-  /**
-   * Create and return Router.
-   * 
-   * @class App
-   * @method routes
-   * @private
-   */
-  private routes() {
-    const router: express.Router = express.Router()
-
-    IndexRoute.create(router)
-    this.express.use(router)
-  }
 }
 
-const app = App.bootstrap()
-export default app
+export default App

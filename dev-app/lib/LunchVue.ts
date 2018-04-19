@@ -8,113 +8,60 @@ import * as cheerio from 'cheerio'
  * Thank you very much for your help ⸻ @Danuel (https://twitter.com/_danuel_)
  */
 
-export type NOT_EXISTS = ''
-export type MenuTable = (NOT_EXISTS | DailyMenu)[]
+interface Domain {
+  readonly name: string
+  readonly ltd?: string
+}
 
-export type Menu = NOT_EXISTS | {
+interface Spread {
+  readonly name: string
+  readonly code: string
+  readonly type: string
+  readonly address: string
+  readonly domain: string
+}
+
+type NOT_EXISTS = ''
+type MenuTable = (NOT_EXISTS | DailyMenu)[]
+
+type Menu = NOT_EXISTS | {
   food: Food
   nutrition: Nutrition
 }
 
-export type DailyMenu = {
+type DailyMenu = {
   breakfast: Menu
   lunch: Menu
   dinner: Menu
 }
 
-export type Food = string[]
-export type Nutrition = string[] | null
+type Food = string[]
+type Nutrition = string[] | null
 
-export type HTML = string
+type HTML = string
 
-export const NOT_EXISTS = ''
-export const enum MENU {
+const NOT_EXISTS = ''
+const enum MENU {
   BREAKFAST = '조식',
   LUNCH = '중식',
   DINNER = '석식'
 }
 
-/**
- * LunchVue Server Library v0.1.4 (https://github.com/Kurosnape/LunchVue)
- * Copyright 2018 LunchVue Authors
- * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
- */
-class LunchVue {
-  PREFIX: string
-  TYPE: object
-  SUFFIX: string
-  DOMAIN: string[]
-  DATA: object[]
+export class LunchVue {
+  private static instance: LunchVue
 
-  constructor() {
-    this.init()
-  }
+  public static getInstance() {
+    if (!this.instance) {
+      this.instance = new LunchVue()
+    }
 
-  /**
-   * Bootstrap the LunchVue Library.
-   * 
-   * @class bootstrap
-   * @method bootstrap
-   * @static
-   * @return {LunchVue}
-   */
-  public static bootstrap(): LunchVue {
     return new LunchVue()
   }
 
-  /**
-   * Initialize LunchVue
-   * 
-   * @class LunchVue
-   * @method init
-   * @private
-   */
-  private init() {
-    this.PREFIX = 'stu.'
-    this.SUFFIX = '.go.kr'
-    this.TYPE = [
-      'sen',  // 서울특별시
-      'pen',  // 부산광역시
-      'dge',  // 대구광역시
-      'ice',  // 인천광역시
-      'gen',  // 광주광역시
-      'dje',  // 대전광역시
-      'use',  // 울산광역시
-      'sje',  // 세종특별자치시
-      'goe',  // 경기도
-      'gwe',  // 강원도
-      'cbe',  // 충청북도
-      'cne',  // 충청남도
-      'jbe',  // 전라북도
-      'jne',  // 전라남도
-      'gbe',  // 경상북도
-      'gne',  // 경상남도
-      'jje'   // 제주도
-    ]
-    this.DOMAIN = []
-    this.DATA = []
+  private readonly domainList = this.initialiseDomainList()
 
-    for (const i in this.TYPE) {
-      // Because Gyeongsangbuk-do(경상북도) use different domain
-      if (this.TYPE[i] === 'gbe') {
-        this.DOMAIN.push(this.PREFIX + this.TYPE[i] + '.kr')
-        continue
-      }
-
-      this.DOMAIN.push(this.PREFIX + this.TYPE[i] + this.SUFFIX)
-    }
-  }
-
-  /**
-   * Ask all education offices to check there is a school.
-   * 
-   * @class LunchVue
-   * @method reqeust2
-   */
-  async request2(school: string) {
-    const query = encodeURIComponent(school)
-    const payload = {
-      uri: '',
+  private get payload(): request.CoreOptions {
+    return {
       rejectUnauthorized: false, // for unable to verify the first certificate in nodejs, reject unauthorized is needed
       gzip: true,
       json: true,
@@ -122,147 +69,123 @@ class LunchVue {
         'User-Agent': 'lunchvue-request-bot'
       }
     }
-
-    const resultList = this.DOMAIN.map((domain): Promise<any[]> =>
-      new Promise((resolve, reject): void => {
-        payload.uri = `http://${ domain }/spr_ccm_cm01_100.do?kraOrgNm=${ query }`
-
-        const validator = (error, res, body): void => {
-          if (error) {
-            reject(error)
-            return
-          }
-
-          if (res.statusCode !== 200) {
-            const message = 'invalid request'
-            const reason = new Error(message)
-            reject(reason)
-            return
-          }
-
-          const data = body.resultSVO.orgDVOList
-          const spreadList = data.map((spread) => {
-            const {
-              kraOrgNm: name,
-              orgCode: code,
-              schulCrseScCodeNm: type,
-              zipAdres: address
-            } = spread
-
-            return { name, code, type, address, domain }
-          })
-
-          resolve(spreadList)
-        }
-
-        request(payload, validator)
-      }))
-
-    const result = await Promise.all(resultList)
-    return result.filter((data): boolean => (data.length !== 0))
   }
 
-  /**
-   * Get meals from government.
-   * 
-   * @class LunchVue
-   * @method get
-   */
-  async get(domain: string, code: string, month: number) {
-    const result = await new Promise((resolve, reject): void => {
-      const payload = {
-        uri: `http://${ domain }/sts_sci_md00_001.do?schulCode=${ code }&schulCrseScCode=4&ay=${ new Date().getFullYear() }&mm=${ ('0' + month).substr(-2) }`,
-        rejectUnauthorized: false,
-        gzip: true,
-        headers: {
-          'User-Agent': 'lunchvue-request-bot'
-        }
-      }
+  public async fetch(domain: string, code: string, month: number): Promise<any> {
+    const uri = `http://${ domain }/sts_sci_md00_001.do?schulCode=${ code }&schulCrseScCode=4&ay=${ new Date().getFullYear() }&mm=${ ('0' + month).substr(-2) }`
+    const payload: request.CoreOptions & request.UriOptions = { ...this.payload, uri }
 
-      const validator = (error, res, body): MenuTable => {
-        if (error) {
-          reject(error)
-          return
-        }
+    const response = await this.request(payload)
+    const data: any[] = this.getMeals(response)
 
-        if (res.statusCode !== 200) {
-          const message = 'invalid request'
-          const reason = new Error(message)
-          reject(reason)
-          return
-        }
+    return data
+  }
 
-        const data = LunchVue.getMeals(body)
-        resolve(data)
-      }
+  public async find(school: string): Promise<Spread[][]> {
+    const query = encodeURIComponent(school)
+    const payload = this.payload
 
-      request(payload, validator)
+    const requestList = this.domainList.map(async (domain): Promise<Spread[]> => {
+      const uri = `http://${ domain }/spr_ccm_cm01_100.do?kraOrgNm=${ query }`
+      const payload: request.CoreOptions & request.UriOptions = { ...this.payload, uri }
+
+      const response = await this.request(payload)
+      const data: any[] = response.resultSVO.orgDVOList
+      const spreadList: Spread[] = data.map((spread): Spread => {
+        const {
+          kraOrgNm: name,
+          orgCode: code,
+          schulCrseScCodeNm: type,
+          zipAdres: address
+        } = spread
+
+        return { name, code, type, address, domain }
+      })
+
+      return spreadList
     })
 
-    return result
+    const resultList = await Promise.all(requestList)
+      .then((result: Spread[][]) =>
+        result.filter((data): boolean => (!!data.length))
+      )
+
+    return resultList
   }
 
-  /**
-   * @class LunchVue
-   * @method getMeals
-   * @author danuel
-   */
-  protected static getMeals(body: HTML): MenuTable {
-    const pureElement = LunchVue.normalizationHTML(body)
+  private initialiseDomainList(): string[] {
+    const PREFIX = 'stu'
+    const SUFFIX = 'go.kr'
+    const domainList: Domain[] = [
+      { name: 'sen' }, // 서울특별시
+      { name: 'pen' }, // 부산광역시
+      { name: 'dge' }, // 대구광역시
+      { name: 'ice' }, // 인천광역시
+      { name: 'gen' }, // 광주광역시
+      { name: 'dje' }, // 대전광역시
+      { name: 'use' }, // 울산광역시
+      { name: 'sje' }, // 세종특별자치시
+      { name: 'goe' }, // 경기도
+      { name: 'gwe' }, // 강원도
+      { name: 'cbe' }, // 충청북도
+      { name: 'cne' }, // 충청남도
+      { name: 'jbe' }, // 전라북도
+      { name: 'jne' }, // 전라남도
+      { name: 'gbe', ltd: 'kr' }, // 경상북도
+      { name: 'gne' }, // 경상남도
+      { name: 'jje' } // 제주도
+    ]
+
+    return domainList.map(({ name, ltd }): string => [PREFIX, name, (ltd) || SUFFIX].join('.'))
+  }
+
+  private request(payload: request.CoreOptions & (request.UriOptions | request.UrlOptions)): Promise<any> {
+    return new Promise((resolve, reject): void => {
+      request(payload, (error, _, body) => (error) ? reject(error) : resolve(body))
+    })
+  }
+
+  private getMeals(body: HTML): MenuTable {
+    const pureElement = this.normalizationHTML(body)
 
     return pureElement.map((value: string, index: number) => {
-      const menuTable = value === NOT_EXISTS
+      const menuTable: NOT_EXISTS | DailyMenu = value === NOT_EXISTS
         ? NOT_EXISTS
-        : LunchVue.getDayMenu(value)
-
+        : this.getDayMenu(value)
+      
       return menuTable
     })
     .filter((value: any) => !!value)
   }
 
-  /**
-   * @class LunchVue
-   * @method normalizationHTML
-   * @author danuel
-   */
-  protected static normalizationHTML(body: string) {
-    // 영양소 성분이 없는 식단도 줄 바꿈을 해주어야하기 때문에
-    // <br> 태그가 제거되기 전에 필터링합니다.
+  private normalizationHTML(body: string) {
+    // 영양소 성분이 없는 식단도 줄 바꿈을 해 주기 위해서
+    // <br> 엘리먼트가 필터링되기 전에 대체(replace)합니다.
     //
-    // 영양소 성분으로 임시적으로 'HACKED'합니다.
-    // 나중에 수정해야합니다. 또한 영양소 성분도 정상 작동하지 않을겁니다.
+    // 임시로 영양소 성분처럼 HACKED 합니다.
+    // TODO. 나중에 수정해야 합니다.
     const breakToken = '1.'
     const $ = cheerio.load(body.replace(/<br\s*[\/]?>/gi, breakToken), {
-      xmlMode: false
+      xmlMode: true
     })
 
     const separateElement = 'tbody tr td'
     const divisionalExpression = /\s+/
     return $(separateElement).map(function(index, element) {
-      return $(this).text().replace(divisionalExpression, NOT_EXISTS)//.replace(new RegExp('__BREAK__', 'g'), '<br>')
+      return $(this).text().replace(divisionalExpression, NOT_EXISTS)
     }).get()
     .filter((value) => value !== ' ')
   }
 
-  /**
-   * @class LunchVue
-   * @method getDayMenu
-   * @author danuel
-   */
-  protected static getDayMenu(value: string): DailyMenu {
+  private getDayMenu(value: string): DailyMenu {
     return {
-      breakfast: LunchVue.extractMenu(MENU.BREAKFAST, value),
-      lunch: LunchVue.extractMenu(MENU.LUNCH, value),
-      dinner: LunchVue.extractMenu(MENU.DINNER, value)
+      breakfast: this.extractMenu(MENU.BREAKFAST, value),
+      lunch: this.extractMenu(MENU.LUNCH, value),
+      dinner: this.extractMenu(MENU.DINNER, value)
     }
   }
 
-  /**
-   * @class LunchVue
-   * @method extractMenu
-   * @author danuel
-   */
-  protected static extractMenu(menu: MENU, value: string): Menu {
+  private extractMenu(menu: MENU, value: string): Menu {
     const pattern = new RegExp(`(\\[${ menu }\\])(.+?)(?=\\[)`)
 
     // hack for pattern-matching
@@ -270,16 +193,11 @@ class LunchVue {
     const __menu = __value.match(pattern)
 
     return (__menu)
-      ? LunchVue.separateMenu(__menu[2])
+      ? this.separateMenu(__menu[2])
       : NOT_EXISTS
   }
 
-  /**
-   * @class LunchVue
-   * @method separateMenu
-   * @author danuel
-   */
-  protected static separateMenu(menu: string): Menu {
+  private separateMenu(menu: string): Menu {
     return {
       food: menu
         .split(/\d{1,2}\./g)
@@ -289,5 +207,3 @@ class LunchVue {
     }
   }
 }
-
-export default LunchVue.bootstrap()
