@@ -1,9 +1,15 @@
 /**
- * LunchVue Client Library v0.1.16 (https://github.com/Kurosnape/LunchVue)
- * Copyright 2018 LunchVue Authors
+ * LunchVue Client Library v0.1.16
+ * Project: https://github.com/Kurosnape/LunchVue
+ * 
+ * Contributed by:  Kurosnape <https://github.com/Kurosnape>
+ *                  Danuel <https://github.com/OnLiU211>
+ * 
+ * Copyright 2018 Kurosnape, LunchVue Contributors
  * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
  */
-class LunchVue {
+
+export class LunchVue {
   constructor() {
     this.initVariables()
     this.bindEvents()
@@ -74,9 +80,9 @@ class LunchVue {
       this.schoolName = localStorage[`schoolName`]
       this.schoolDomain = localStorage[`schoolDomain`]
 
-      if (!!localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.date.getMonth() + 1)}`]) {
+      if (!!localStorage[`schoolMeals_${this.schoolId}_${this._formatZeroFill(this.date.getMonth() + 1)}`]) {
         this.haveSchoolMeals = true
-        this.meals.current = JSON.parse(localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.date.getMonth() + 1)}`])
+        this.meals.current = JSON.parse(localStorage[`schoolMeals_${this.schoolId}_${this._formatZeroFill(this.date.getMonth() + 1)}`])
       }
     }
   }
@@ -95,7 +101,7 @@ class LunchVue {
       domain: this.schoolDomain,
       code: this.schoolId
     }).done((data) => {
-      localStorage[`schoolMeals_${this.schoolId}_${this.zeroFill(this.date.getMonth() + 1)}`] = JSON.stringify(data)
+      localStorage[`schoolMeals_${this.schoolId}_${this._formatZeroFill(this.date.getMonth() + 1)}`] = JSON.stringify(data)
       this.initVariables()
       $( document ).trigger('preload-end')  // 지우지 마세요.
     })
@@ -142,7 +148,7 @@ class LunchVue {
    * 날짜 선택창을 띄웁니다.
    */
   appendDateModal() {
-    const form = `${ this.date.getFullYear() }-${ this.zeroFill(this.date.getMonth() + 1, 2) }`
+    const form = `${ this.date.getFullYear() }-${ this._formatZeroFill(this.date.getMonth() + 1, 2) }`
     this.$selectDateInput.attr('min', `${ form }-01`)
     this.$selectDateInput.attr('max', `${ form }-${ new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate() }`)
     this.$dateForm.modal('show')
@@ -151,9 +157,6 @@ class LunchVue {
   /**
    * 검색폼을 서버에 전송합니다. 검색할 창과 동일한 전국의
    * 모든 학교 이름과 주소, 코드를 반환합니다.
-   * 
-   * @class LunchVue
-   * @method searchSubmit
    */
   searchSubmit() {
     const similarySchoolName = this.$searchSchoolInput.val()
@@ -234,38 +237,52 @@ class LunchVue {
   }
 
   /**
-   * 날짜를 계산하는 함수 헬퍼입니다.
+   * [ Helper Function ]: Calculate the date automatically
+   * @desc 자동으로 날짜를 변환하여 줍니다.
    * 
-   * @class LunchVue
    * @method calcDate
-   * @param {object} date - UTC 날짜
-   * @return {string} 계산된 날짜를 변환합니다.
-   * @example "2018. 04. 16"
+   * @param {Object} date Input date
+   * @return {String} Convert to a preset date
+   * 
+   * @private
    */
   calcDate(date) {
-    return `${date.getFullYear()}. ${this.zeroFill(date.getMonth() + 1, 2)}. ${this.zeroFill(date.getDate(), 2)}`
+    return `${date.getFullYear()}. ${this._formatZeroFill(date.getMonth() + 1)}. ${this._formatZeroFill(date.getDate())}`
   }
 
   /**
-   * 여백을 채워주는 함수 헬퍼입니다.
+   * [ Helper Function ]: Fills space by pad
+   * @desc `pad`만큼 여백을 채워줍니다.
    * 
-   * @class LunchVue
-   * @method zeroFill
-   * @param {number} number - 앞에 여백으로 채울 숫자
-   * @param {number} pad - 채울 칸 수
-   * @return {numberic?} 
-   * @example zeroFill(72, 4) returns "0072"
+   * @param {(Number|String)} value Target value
+   * @param {Number} pad Length of result
+   * @return {String} Formatted value
+   * 
+   * @private
    */
-  zeroFill(number, pad = 2) {
+  _formatZeroFill(value, pad = 2) {
     const proxy = '0'.repeat(pad - 1)
-    return (proxy + number).substr(-pad)
+    return (proxy + value).substr(-pad)
   }
 
   /**
-   * 메시지를 표시합니다. 디버그 모드에서는 로그도 출력합니다.
+   * [ Helper Function ]: Format decimal
+   * @desc `len` 소수점 이하는 제거합니다.
    * 
-   * @class LunchVue
-   * @method displayAlert
+   * @param {Number} value Target value
+   * @param {Number} len Length of under decimal point
+   * @return {Number} Formatted value
+   * 
+   * @since 0.1.17
+   * @private
+   */
+  _formatDecimal(value, len = 3) {
+    //
+  }
+
+  /**
+   * 메시지를 표시합니다.
+   * 
    * @param {string} type - 출력할 타입
    * @param {string} message - 표시할 메시지
    */
@@ -275,9 +292,6 @@ class LunchVue {
 
   /**
    * 요소의 이벤트를 바인딩합니다.
-   * 
-   * @class LunchVue
-   * @method bindEvents
    */
   bindEvents() {
     // Hacks for execute functions
@@ -366,5 +380,3 @@ class LunchVue {
     })
   }
 }
-
-export default LunchVue

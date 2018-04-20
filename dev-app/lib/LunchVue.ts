@@ -48,8 +48,13 @@ const enum MENU {
 }
 
 /**
- * LunchVue Server Library v0.1.4 (https://github.com/Kurosnape/LunchVue)
- * Copyright 2018 LunchVue Authors
+ * LunchVue Server Library v0.1.4
+ * Project: (https://github.com/Kurosnape/LunchVue)
+ * 
+ * Contributed by:  Kurosnape <https://github.com/Kurosnape>
+ *                  Danuel <https://github.com/OnLiU211>
+ * 
+ * Copyright 2018 Kurosnape, LunchVue Contributors
  * Licensed under MIT (https://github.com/Kurosnape/LunchVue/blob/master/LICENSE)
  */
 export class LunchVue {
