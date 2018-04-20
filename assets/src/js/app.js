@@ -2,6 +2,7 @@ import 'babel-polyfill'
 import LunchVue from './LunchVue'
 
 $(() => {
+  'use strict'
   $(document).trigger('page-loaded')
   new LunchVue()
 })

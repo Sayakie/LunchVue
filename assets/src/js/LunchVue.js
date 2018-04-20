@@ -17,14 +17,9 @@ class LunchVue {
     this.date = new Date()
     this.time = this.date.getHours() <= 8 ? 'breakfast' : this.date.getHours() >= 9 && this.date.getHours() <= 14 ? 'lunch' : 'dinner'
     this.temp = {}
+    this.temp.time = this.time
     this.temp.date = this.date
     this.meals = {}
-    /**
-     * this.meals.prev = null
-     * 
-     * @description 과거 식단은 쓸모가 없다고 판단, 다음 버전에서 제거됩니다.
-     * @deprecated
-     */
     this.meals.current = null
     this.meals.next = null
     this.schoolId = null
@@ -42,6 +37,8 @@ class LunchVue {
     this.$searchForm = $('#searchForm')
     this.$searchSchoolInput = $('#searchSchoolInput')
     this.$searchResult = $('#searchResult')
+    this.$dateForm = $('#dateForm')
+    this.$selectDateInput = $('#selectDateInput')
     this.$mealResult = $('#mealResult')
     this.$device = $('#device')
     this.$result = $('#mealResult')
@@ -142,6 +139,16 @@ class LunchVue {
   }
 
   /**
+   * 날짜 선택창을 띄웁니다.
+   */
+  appendDateModal() {
+    const form = `${ this.date.getFullYear() }-${ this.zeroFill(this.date.getMonth() + 1, 2) }`
+    this.$selectDateInput.attr('min', `${ form }-01`)
+    this.$selectDateInput.attr('max', `${ form }-${ new Date(this.date.getFullYear(), this.date.getMonth() + 1, 0).getDate() }`)
+    this.$dateForm.modal('show')
+  }
+
+  /**
    * 검색폼을 서버에 전송합니다. 검색할 창과 동일한 전국의
    * 모든 학교 이름과 주소, 코드를 반환합니다.
    * 
@@ -194,10 +201,36 @@ class LunchVue {
    * @class LunchVue
    * @method printMeals
    */
-  printMeals(date = this.date.getDate() - 1, time = this.time) {
+  printMeals(date = this.date.getDate() - 1, time = $('.nav li.active').data('type')) {
     const meals = !!this.meals.current[date][time]['food'] ? this.meals.current[date][time]['food'].join('<br>') : "식단이 없어요."
 
     this.$result.html(meals)
+  }
+
+  /**
+   * 조식, 중식, 석식 메뉴를 다시 그립니다.
+   */
+  repaintNav($selector) {
+    //const $selector = $(selector)
+
+    this.$list.removeClass('active')
+    $selector.addClass('active')
+    this.printMeals(this.date.getDate() - 1, $selector.data('type'))
+  }
+
+  /**
+   * 
+   */
+  automaticRepaintNav() {
+    const $finder = $('.nav li.active').next()
+
+    if (!$finder.length) {
+      this.$list.removeClass('active')
+      $(`.nav li[data-type='breakfast']`).addClass('active')
+      this.$nextBtn.click()
+    }
+
+    this.repaintNav($finder)
   }
 
   /**
@@ -263,6 +296,10 @@ class LunchVue {
       this.appendSearchModal()
     })
 
+    this.$schoolDate.bind('click', () => {
+      this.appendDateModal()
+    })
+
     this.$prevBtn.bind('click', () => {
       this.temp.date.setDate(this.temp.date.getDate() - 1)
       this.$schoolDate.html(this.calcDate(this.date))
@@ -282,9 +319,39 @@ class LunchVue {
     })
 
     $( document ).bind('keydown', (e) => {
+      let $finder = null
+
       switch (e.keyCode) {
-        case 27:
+        case 9:  // 탭 키
+          // Too many bugs exists
+          // this.automaticRepaintNav()
+          break
+        case 27:  // 엔터 키
           this.appendSearchModal()
+          break
+        case 38:  // Arrow up 키
+          this.$nextBtn.click()
+          break
+        case 40:  // Arrow down 키
+          this.$prevBtn.click()
+          break
+        case 37:  // Arrow left 키
+          $finder = $('.nav li.active').prev()
+
+          if (!$finder.length) {
+            return
+          }
+
+          this.repaintNav($finder)
+          break
+        case 39:  // Arrow right 키
+          $finder = $('.nav li.active').next()
+
+          if (!$finder.length) {
+            return
+          }
+          
+          this.repaintNav($finder)
           break
         default:
           break
